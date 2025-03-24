@@ -1,4 +1,10 @@
-# Clubatlas
+# Club Atlas
+
+The purpose of this project is to provide a website to facilitate searching a sport club in your region.
+
+It's also a template generator and host for sport clubs who would want a nice presentation of their activity to share on the net and social medias.
+
+
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
 
