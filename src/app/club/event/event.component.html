@@ -1,0 +1,56 @@
+<div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12">Événements</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Generate cards for actual events -->
+      <div *ngFor="let event of events" class="h-[400px] perspective">
+        <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d hover:rotate-y-180">
+          <!-- Front of card -->
+          <div class="absolute w-full h-full backface-hidden">
+            <div class="bg-white h-full rounded-lg shadow-lg overflow-hidden">
+              <div class="h-1/2">
+                <img [src]="event.imageUrl" [alt]="event.title" class="w-full h-full object-cover">
+              </div>
+              <div class="p-6">
+                <h3 class="text-gray-600 text-xl font-bold mb-2">{{ event.title }}</h3>
+                <p class="text-gray-600 font-medium mb-2">{{ event.subtitle }}</p>
+                <p class="font-semibold text-[#f84c00]">{{ event.price }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Back of card -->
+          <div class="absolute w-full h-full backface-hidden rotate-y-180">
+            <div 
+              class="h-full rounded-lg shadow-lg overflow-hidden p-6 flex items-center justify-center relative"
+              [style.background-image]="'url(' + event.imageUrl + ')'"
+              style="background-size: cover; background-position: center;"
+            >
+              <!-- Dark overlay -->
+              <div class="absolute inset-0 bg-black opacity-75"></div>
+              <!-- Content -->
+              <p class="text-white text-center text-lg relative z-10">{{ event.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder cards if needed -->
+      <div *ngFor="let placeholder of placeholders" class="h-[400px] perspective">
+        <div class="relative w-full h-full">
+          <!-- Front of placeholder -->
+          <div class="absolute w-full h-full">
+            <div class="bg-white h-full rounded-lg shadow-lg overflow-hidden">
+              <div class="h-1/2 bg-gray-200 flex items-center justify-center">
+                <i class="fas fa-calendar-alt text-4xl text-gray-400"></i>
+              </div>
+              <div class="p-6 flex flex-col items-center justify-center">
+                <h3 class="text-xl font-bold mb-2">À venir</h3>
+                <p class="text-gray-600 text-center">Nouvel événement bientôt annoncé</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

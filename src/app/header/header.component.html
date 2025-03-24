@@ -1,0 +1,22 @@
+<header [class.sticky]="true" class="fixed top-0 left-0 right-0 bg-gray-900 text-white shadow-md z-50">
+  <nav class="container mx-auto px-4 py-4">
+    <div class="flex items-center">
+      <div class="mr-[10px]">
+        <a [routerLink]="['/']" (click)="scrollToTop($event)">
+          <img src="../../assets/logo_tchak_wa.png" alt="Logo" class="w-[50px] h-[50px]">
+        </a>
+      </div>
+      <div class="text-3xl font-bold"><a [routerLink]="['/']" (click)="scrollToTop($event)">Tchak</a></div>
+      <div class="flex-grow">
+        <ul class="flex justify-center space-x-12">          
+          <li>
+            <a [routerLink]="['/club']" i18n
+              class="bg-[#f84c00] text-white px-6 py-2 rounded-lg hover:bg-[#d94400] text-lg transition-colors">
+              Club Template
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
