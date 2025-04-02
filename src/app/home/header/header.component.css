@@ -1,20 +1,98 @@
-.sticky {
-    position: fixed;
-    top: 0;
-    width: 100%;
-  }
-  
-  a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -4px;
-    left: 0;
-    background-color: #f84c00;
-    transition: width 0.3s ease;
-  }
+/* Transition effects */
+header {
+  transition: all 0.3s ease;
+}
 
-  a:hover::after {
-    width: 100%;
+header.sticky {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown animations */
+div[class*="dropdown"] {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Logo animation */
+a img {
+  transition: transform 0.3s;
+}
+
+a img:hover {
+  transform: scale(1.05);
+}
+
+/* Button hover effects */
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Selected day/time styles */
+.selected-option {
+  transform: scale(0.95);
+}
+
+/* Custom scrollbar for dropdowns */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f84c00;
+}
+
+/* Focus styles for inputs */
+input:focus, select:focus {
+  outline: none;
+  border-color: #f84c00;
+  box-shadow: 0 0 0 2px rgba(248, 76, 0, 0.2);
+}
+
+/* Mobile search panel */
+.mobile-search {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.mobile-search.open {
+  max-height: 500px;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media queries for responsive adjustments */
+@media (max-width: 640px) {
+  .logo-text {
+    display: none;
+  }
+}
+
+/* Optional: Glass effect for the search bar */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.7);
+}

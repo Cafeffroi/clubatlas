@@ -1,7 +1,108 @@
 <app-header></app-header>
 
-<main class="pt-[68px]">
-  
-</main>
+<div class="clubs-page-container">
+  <!-- Location permission popup -->
+  <div *ngIf="showLocationPrompt" class="location-prompt">
+    <div class="location-prompt-content">
+      <h2 class="text-xl font-bold mb-4">Enable Location Services</h2>
+      <p class="mb-4">Would you like to share your location to see nearby sports clubs and view them on a map?</p>
+      <div class="flex space-x-4">
+        <button (click)="handleLocationChoice(true)" class="bg-[#f84c00] text-white px-4 py-2 rounded hover:bg-[#d94400] transition-colors">
+          Yes, share my location
+        </button>
+        <button (click)="handleLocationChoice(false)" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition-colors">
+          No, thanks
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoadingLocation" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Getting your location...</p>
+  </div>
+
+  <!-- Map View (when location is shared) -->
+  <div *ngIf="locationShared === true" class="map-view">
+    <!-- Left sidebar with clubs list -->
+    <div class="clubs-sidebar">
+      <h2 class="text-xl font-bold mb-4">Clubs Near You</h2>
+      
+      <!-- Club list -->
+      <div class="clubs-list">
+        <div *ngFor="let club of clubs" class="club-item">
+          <img [src]="club.photo" [alt]="club.name" class="club-photo">
+          <div class="club-info">
+            <h3 class="club-name">{{ club.name }}</h3>
+            <div class="club-rating">
+              <span class="stars">
+                <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.text-yellow-400]="star <= club.rating" [class.text-gray-300]="star > club.rating"></i>
+              </span>
+              <span class="rating-value">{{ club.rating }}</span>
+            </div>
+            <p class="club-address">{{ club.address }}</p>
+            <p *ngIf="club.distance" class="club-distance">{{ club.distance }} away</p>
+            <div class="club-sports">
+              <span *ngFor="let sport of club.sportTypes" class="sport-tag">{{ sport }}</span>
+            </div>
+            <div class="club-hours">
+              <i class="far fa-clock mr-1"></i>
+              <span *ngFor="let schedule of club.openingHours" class="schedule-item">
+                {{ schedule.days }}: {{ schedule.hours }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Google Map -->
+    <div class="map-container">
+      <google-map
+        height="100%"
+        width="100%"
+        [options]="mapOptions">
+        <map-marker
+          *ngFor="let club of clubs"
+          [position]="club.position"
+          [title]="club.name">
+        </map-marker>
+        <map-info-window>Selected club info</map-info-window>
+      </google-map>
+    </div>
+  </div>
+
+  <!-- Grid View (when location is not shared) -->
+  <div *ngIf="locationShared === false" class="grid-view">
+    <h2 class="text-xl font-bold mb-4">Sports Clubs</h2>
+    
+    <!-- Club cards grid -->
+    <div class="clubs-grid">
+      <div *ngFor="let club of clubs" class="club-card">
+        <img [src]="club.photo" [alt]="club.name" class="card-photo">
+        <div class="card-content">
+          <h3 class="card-title">{{ club.name }}</h3>
+          <div class="club-rating">
+            <span class="stars">
+              <i *ngFor="let star of [1,2,3,4,5]" class="fas fa-star" [class.text-yellow-400]="star <= club.rating" [class.text-gray-300]="star > club.rating"></i>
+            </span>
+            <span class="rating-value">{{ club.rating }}</span>
+          </div>
+          <p class="card-address">{{ club.address }}</p>
+          <div class="card-sports">
+            <span *ngFor="let sport of club.sportTypes" class="sport-tag">{{ sport }}</span>
+          </div>
+          <div class="card-hours">
+            <i class="far fa-clock mr-1"></i>
+            <div *ngFor="let schedule of club.openingHours" class="schedule-item">
+              {{ schedule.days }}: {{ schedule.hours }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <app-footer></app-footer>

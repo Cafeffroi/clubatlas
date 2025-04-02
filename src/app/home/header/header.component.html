@@ -1,22 +1,193 @@
 <header [class.sticky]="true" class="fixed top-0 left-0 right-0 bg-gray-900 text-white shadow-md z-50">
   <nav class="container mx-auto px-4 py-4">
-    <div class="flex items-center">
-      <div class="mr-[10px]">
-        <a [routerLink]="['/']" (click)="scrollToTop($event)">
-          <img src="../../assets/logo_tchak_wa.png" alt="Logo" class="w-[50px] h-[50px]">
+    <div class="flex items-center justify-between">
+      <!-- Left section: Logo and name -->
+      <div class="flex items-center">
+        <a [routerLink]="['/']" (click)="scrollToTop($event)" class="flex items-center">
+          <img src="../../../assets/clubatlas.png" alt="Logo" class="w-[50px] h-[50px]">
+          <span class="text-3xl font-bold ml-2 hidden sm:block">Club Atlas</span>
         </a>
       </div>
-      <div class="text-3xl font-bold"><a [routerLink]="['/']" (click)="scrollToTop($event)">Tchak</a></div>
-      <div class="flex-grow">
-        <ul class="flex justify-center space-x-12">          
-          <li>
-            <a [routerLink]="['/club']" i18n
-              class="bg-[#f84c00] text-white px-6 py-2 rounded-lg hover:bg-[#d94400] text-lg transition-colors">
-              Club Template
+
+      <!-- Center section: Search form -->
+      <div class="hidden md:flex flex-grow justify-center mx-4">
+        <div class="bg-white rounded-full shadow-lg flex items-center text-gray-700 divide-x divide-gray-300">
+          <!-- Where -->
+          <div class="relative group">
+            <button (click)="toggleSearchDropdown('location')" class="px-4 py-2 rounded-l-full hover:bg-gray-100 transition-colors focus:outline-none">
+              <div class="text-sm font-medium">Where</div>
+              <div class="text-xs text-gray-500">Search location</div>
+            </button>
+            <div *ngIf="activeDropdown === 'location'" class="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg p-4 z-20">
+              <div class="mb-2">
+                <label class="block text-sm font-medium mb-1">Address</label>
+                <input type="text" placeholder="Enter location" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Search radius</label>
+                <select class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]">
+                  <option value="1">1 km</option>
+                  <option value="5">5 km</option>
+                  <option value="10">10 km</option>
+                  <option value="25">25 km</option>
+                  <option value="50">50 km</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- What -->
+          <div class="relative group">
+            <button (click)="toggleSearchDropdown('activity')" class="px-4 py-2 hover:bg-gray-100 transition-colors focus:outline-none">
+              <div class="text-sm font-medium">What</div>
+              <div class="text-xs text-gray-500">Sport type</div>
+            </button>
+            <div *ngIf="activeDropdown === 'activity'" class="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg p-4 z-20">
+              <div class="mb-2">
+                <label class="block text-sm font-medium mb-1">Sport activity</label>
+                <select class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]">
+                  <option value="">All sports</option>
+                  <option value="soccer">Soccer</option>
+                  <option value="basketball">Basketball</option>
+                  <option value="tennis">Tennis</option>
+                  <option value="swimming">Swimming</option>
+                  <option value="running">Running</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- When -->
+          <div class="relative group">
+            <button (click)="toggleSearchDropdown('time')" class="px-4 py-2 hover:bg-gray-100 transition-colors focus:outline-none">
+              <div class="text-sm font-medium">When</div>
+              <div class="text-xs text-gray-500">Training time</div>
+            </button>
+            <div *ngIf="activeDropdown === 'time'" class="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg p-4 z-20">
+              <div class="mb-2">
+                <label class="block text-sm font-medium mb-1">Day of training</label>
+                <div class="grid grid-cols-7 gap-1">
+                  <button *ngFor="let day of weekDays" 
+                          class="p-2 rounded text-center text-sm transition-colors"
+                          [class.bg-[#f84c00]]="selectedDays.includes(day)"
+                          [class.text-white]="selectedDays.includes(day)"
+                          [class.bg-gray-100]="!selectedDays.includes(day)"
+                          (click)="toggleDay(day)">
+                    {{day}}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Time of day</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button *ngFor="let timeOfDay of timesOfDay" 
+                          class="p-2 rounded text-center text-sm transition-colors"
+                          [class.bg-[#f84c00]]="selectedTimes.includes(timeOfDay)"
+                          [class.text-white]="selectedTimes.includes(timeOfDay)"
+                          [class.bg-gray-100]="!selectedTimes.includes(timeOfDay)"
+                          (click)="toggleTimeOfDay(timeOfDay)">
+                    {{timeOfDay}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search button -->
+          <button class="bg-[#f84c00] text-white px-6 py-3 rounded-r-full hover:bg-[#d94400] transition-colors flex items-center">
+            <i class="fas fa-search mr-2"></i>
+            <span>Search</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile search toggle button -->
+      <button class="md:hidden bg-[#f84c00] text-white p-2 rounded-full hover:bg-[#d94400] transition-colors" (click)="toggleMobileSearch()">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- Right section: CTA, language, and login -->
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        <a [routerLink]="['/club']" class="hidden sm:block text-sm text-white px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap">
+          <span i18n>Put your club on Club Atlas</span>
+        </a>
+        
+        <button class="p-2 rounded-full hover:bg-gray-800 transition-colors">
+          <i class="fas fa-globe"></i>
+        </button>
+
+        <div class="relative">
+          <button class="flex items-center p-2 rounded-full hover:bg-gray-800 transition-colors" (click)="toggleUserDropdown()">
+            <i class="fas fa-user-circle text-xl"></i>
+          </button>
+          <div *ngIf="userDropdownOpen" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg p-2 z-20 text-gray-700">
+            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100 transition-colors">
+              <span i18n>Connexion</span>
             </a>
-          </li>
-        </ul>
+            <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100 transition-colors">
+              <span i18n>Inscription</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
+
+  <!-- Mobile search form (hidden by default) -->
+  <div *ngIf="mobileSearchOpen" class="md:hidden bg-gray-800 px-4 py-3">
+    <div class="bg-white rounded-lg shadow p-4 text-gray-700">
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Where</label>
+        <input type="text" placeholder="Enter location" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]">
+        <select class="w-full mt-2 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]">
+          <option value="1">1 km radius</option>
+          <option value="5">5 km radius</option>
+          <option value="10">10 km radius</option>
+          <option value="25">25 km radius</option>
+          <option value="50">50 km radius</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">What</label>
+        <select class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]">
+          <option value="">All sports</option>
+          <option value="soccer">Soccer</option>
+          <option value="basketball">Basketball</option>
+          <option value="tennis">Tennis</option>
+          <option value="swimming">Swimming</option>
+          <option value="running">Running</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Day of training</label>
+        <div class="grid grid-cols-7 gap-1">
+          <button *ngFor="let day of weekDays" 
+                  class="p-2 rounded text-center text-xs transition-colors"
+                  [class.bg-[#f84c00]]="selectedDays.includes(day)"
+                  [class.text-white]="selectedDays.includes(day)"
+                  [class.bg-gray-100]="!selectedDays.includes(day)"
+                  (click)="toggleDay(day)">
+            {{day}}
+          </button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Time of day</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button *ngFor="let timeOfDay of timesOfDay" 
+                  class="p-2 rounded text-center text-sm transition-colors"
+                  [class.bg-[#f84c00]]="selectedTimes.includes(timeOfDay)"
+                  [class.text-white]="selectedTimes.includes(timeOfDay)"
+                  [class.bg-gray-100]="!selectedTimes.includes(timeOfDay)"
+                  (click)="toggleTimeOfDay(timeOfDay)">
+            {{timeOfDay}}
+          </button>
+        </div>
+      </div>
+      <button class="w-full bg-[#f84c00] text-white py-2 rounded hover:bg-[#d94400] transition-colors">
+        <i class="fas fa-search mr-2"></i>
+        <span>Search</span>
+      </button>
+    </div>
+  </div>
 </header>
