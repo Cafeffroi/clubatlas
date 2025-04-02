@@ -31,7 +31,11 @@
       
       <!-- Club list -->
       <div class="clubs-list">
-        <div *ngFor="let club of clubs" class="club-item">
+        <div *ngFor="let club of clubs" 
+             [id]="'club-' + club.id"
+             class="club-item"
+             [class.selected]="isClubSelected(club.id)"
+             (click)="selectClub(club)">
           <img [src]="club.photo" [alt]="club.name" class="club-photo">
           <div class="club-info">
             <h3 class="club-name">{{ club.name }}</h3>
@@ -62,13 +66,8 @@
       <google-map
         height="100%"
         width="100%"
-        [options]="mapOptions">
-        <map-marker
-          *ngFor="let club of clubs"
-          [position]="club.position"
-          [title]="club.name">
-        </map-marker>
-        <map-info-window>Selected club info</map-info-window>
+        [options]="mapOptions"
+        (mapInitialized)="onMapInitialized($event)">
       </google-map>
     </div>
   </div>

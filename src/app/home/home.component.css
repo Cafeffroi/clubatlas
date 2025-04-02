@@ -265,3 +265,73 @@
     height: 160px;
   }
 }
+
+/* Additional Info Window Styles for Advanced Markers */
+.gm-style .gm-style-iw-c {
+  padding: 12px;
+  border-radius: 8px;
+  max-width: 300px;
+}
+
+.info-window {
+  font-family: Arial, sans-serif;
+}
+
+.info-window-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.info-window-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.info-window-rating .stars {
+  display: flex;
+  margin-right: 6px;
+}
+
+.info-window-address {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.info-window-distance {
+  font-size: 13px;
+  color: #f84c00;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.info-window-sports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.info-window-sports .sport-tag {
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.info-window-link {
+  display: inline-block;
+  color: #f84c00;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 4px;
+}
+
+.info-window-link:hover {
+  text-decoration: underline;
+}
