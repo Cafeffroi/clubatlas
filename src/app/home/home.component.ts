@@ -45,9 +45,6 @@ export class HomeComponent implements OnInit {
   clubs: Club[] = [];
   selectedClubId: number | null = null;
   selectedClub: Club | null = null;
-  
-  // Track active info window
-  activeInfoWindow: google.maps.InfoWindow | null = null;
 
   // Map instance and markers
   map: google.maps.Map | null = null;
@@ -79,18 +76,19 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  // Get the main activity for image background
+  getMainActivity(club: Club): string {
+    if (club.sportTypes && club.sportTypes.length > 0) {
+      // Get the first sport type and convert to lowercase for filename
+      return club.sportTypes[0].toLowerCase();
+    }
+    // Default activity image if no sport types are available
+    return 'fitness';
+  }
+
   // Initialize map and create advanced markers once the map is loaded
   onMapInitialized(map: google.maps.Map) {
     this.map = map;
-
-    // Add click listener to map background to deselect current club
-    map.addListener('click', (event: google.maps.MapMouseEvent) => {
-      // Only deselect if click wasn't on a marker
-      
-      this.ngZone.run(() => {
-        this.deselectClub();
-      });
-    });
 
     // Now that we have the map instance, we can create advanced markers
     if (this.locationShared) {
@@ -148,12 +146,6 @@ export class HomeComponent implements OnInit {
 
   // Handle marker click
   onMarkerClick(club: Club) {
-    // If clicking already selected club, deselect it
-    if (this.selectedClubId === club.id) {
-      this.deselectClub();
-      return;
-    }
-    
     this.selectedClubId = club.id;
     this.selectedClub = club;
 
@@ -165,72 +157,59 @@ export class HomeComponent implements OnInit {
     this.scrollToClub(club.id);
   }
 
-  // Deselect the current club
-  deselectClub() {
-    this.selectedClubId = null;
-    this.selectedClub = null;
-    this.updateSelectedMarker();
-    this.closeActiveInfoWindow();
-  }
-
-  // Close the active info window
-  closeActiveInfoWindow() {
-    if (this.activeInfoWindow) {
-      this.activeInfoWindow.close();
-      this.activeInfoWindow = null;
-    }
-  }
-
   // Show the info window for a club
   showInfoWindow(club: Club) {
     if (!this.map) return;
 
-    // Close any existing info window
-    this.closeActiveInfoWindow();
-
-    // Create an info window
+    // Create an info window if it doesn't exist
     const infoWindow = new google.maps.InfoWindow({
       content: this.createInfoWindowContent(club),
       position: new google.maps.LatLng(club.position.lat, club.position.lng),
     });
 
-    // Keep track of active info window
-    this.activeInfoWindow = infoWindow;
-
-    // Open the info window
+    // Close any existing info windows and open this one
+    google.maps.event.clearListeners(this.map, 'closeclick');
     infoWindow.open(this.map);
 
     // Listen for info window close events
     infoWindow.addListener('closeclick', () => {
       this.ngZone.run(() => {
-        this.activeInfoWindow = null;
         // Optionally deselect the club when info window is closed
-        // this.deselectClub();
+        // this.selectedClubId = null;
+        // this.selectedClub = null;
+        // this.updateSelectedMarker();
       });
     });
   }
 
   // Create HTML content for info window
   createInfoWindowContent(club: Club): string {
+    const mainActivity = this.getMainActivity(club);
+    
     return `
-      <div class="info-window" style="padding: 10px; max-width: 250px;">
-        <h3 style="margin: 0 0 8px 0; color: #f84c00; font-weight: bold;">${club.name}</h3>
-        <div style="margin-bottom: 5px;">
-          ${this.createStarRating(club.rating)}
-          <span style="margin-left: 5px;">${club.rating}</span>
+      <div class="info-window" style="position: relative; min-height: 120px;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                    background-image: url('../../assets/activities/${mainActivity}.jpg');
+                    background-size: cover; background-position: center; opacity: 0.7; z-index: -1;"></div>
+        <div style="position: relative; z-index: 1; background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); padding: 10px; border-radius: 6px;">
+          <h3 class="info-window-title">${club.name}</h3>
+          <div class="info-window-rating">
+            ${this.createStarRating(club.rating)}
+            <span class="rating-value">${club.rating}</span>
+          </div>
+          <p class="info-window-address">${club.address}</p>
+          ${
+            club.distance
+              ? `<p class="info-window-distance">${club.distance} away</p>`
+              : ''
+          }
+          <div class="info-window-sports">
+            ${club.sportTypes
+              .map((sport) => `<span class="sport-tag">${sport}</span>`)
+              .join('')}
+          </div>
+          <a href="#" class="info-window-link">View Details</a>
         </div>
-        <p style="margin: 5px 0; font-size: 14px;">${club.address}</p>
-        ${
-          club.distance
-            ? `<p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-location-arrow" style="margin-right: 5px;"></i>${club.distance} away</p>`
-            : ''
-        }
-        <div style="margin: 8px 0;">
-          ${club.sportTypes
-            .map((sport) => `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`)
-            .join('')}
-        </div>
-        <a href="#" style="display: inline-block; background: #f84c00; color: white; padding: 5px 12px; border-radius: 4px; text-decoration: none; margin-top: 5px; font-size: 14px;">View Details</a>
       </div>
     `;
   }
@@ -239,10 +218,11 @@ export class HomeComponent implements OnInit {
   createStarRating(rating: number): string {
     let stars = '';
     for (let i = 1; i <= 5; i++) {
-      const color = i <= rating ? '#ffc107' : '#e0e0e0';
-      stars += `<i class="fas fa-star" style="color: ${color}; font-size: 14px;"></i>`;
+      stars += `<i class="fas fa-star ${
+        i <= rating ? 'text-yellow-400' : 'text-gray-300'
+      }"></i>`;
     }
-    return `<span>${stars}</span>`;
+    return `<span class="stars">${stars}</span>`;
   }
 
   // Update marker appearance based on selection
@@ -266,14 +246,14 @@ export class HomeComponent implements OnInit {
         // Reset non-selected markers to default appearance
         marker.zIndex = undefined;
 
-        // Create a default pin - FIX: Using the 'element' property
+        // Create a default pin
         const defaultPin = new google.maps.marker.PinElement({
-          glyph: clubId.toString().charAt(0),
+          glyph: clubId.toString(),
           background: '#4285F4',
           borderColor: '#4285F4',
         });
 
-        // Update the marker content with the correct property
+        // Update the marker content - THIS IS THE FIX
         marker.content = defaultPin.element;
       }
     });
@@ -393,12 +373,6 @@ export class HomeComponent implements OnInit {
 
   // Handle club selection from the list
   selectClub(club: Club) {
-    // If clicking already selected club, deselect it
-    if (this.selectedClubId === club.id) {
-      this.deselectClub();
-      return;
-    }
-    
     this.selectedClubId = club.id;
     this.selectedClub = club;
 
@@ -413,6 +387,9 @@ export class HomeComponent implements OnInit {
 
     // Show info window for the selected club
     this.showInfoWindow(club);
+
+    // Scroll the list to ensure the selected club is visible
+    this.scrollToClub(club.id);
   }
 
   // Helper method to scroll to a specific club in the list
