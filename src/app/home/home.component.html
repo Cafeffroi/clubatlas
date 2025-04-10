@@ -35,8 +35,10 @@
              [id]="'club-' + club.id"
              class="club-item"
              [class.selected]="isClubSelected(club.id)"
-             (click)="selectClub(club)">
-          <img [src]="club.photo" [alt]="club.name" class="club-photo">
+             (click)="selectClub(club)"
+             [style.background-image]="'url(../../assets/activities/' + getMainActivity(club) + '.png)'"
+             [style.background-size]="'cover'"
+             [style.background-position]="'center'">
           <div class="club-info">
             <h3 class="club-name">{{ club.name }}</h3>
             <div class="club-rating">
@@ -90,8 +92,11 @@
     
     <!-- Club cards grid -->
     <div class="clubs-grid">
-      <div *ngFor="let club of clubs" class="club-card">
-        <img [src]="club.photo" [alt]="club.name" class="card-photo">
+      <div *ngFor="let club of clubs" 
+           class="club-card"
+           [style.background-image]="'url(../../assets/activities/' + getMainActivity(club) + '.png)'"
+           [style.background-size]="'cover'"
+           [style.background-position]="'center'">
         <div class="card-content">
           <h3 class="card-title">{{ club.name }}</h3>
           <div class="club-rating">

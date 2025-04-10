@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit {
   clubs: Club[] = [];
   selectedClubId: number | null = null;
   selectedClub: Club | null = null;
-  
+
   // Track active info window
   activeInfoWindow: google.maps.InfoWindow | null = null;
 
@@ -79,6 +79,16 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  // Get the main activity for image background
+  getMainActivity(club: Club): string {
+    if (club.sportTypes && club.sportTypes.length > 0) {
+      // Get the first sport type and convert to lowercase for filename
+      return club.sportTypes[0].toLowerCase();
+    }
+    // Default activity image if no sport types are available
+    return 'fitness';
+  }
+
   // Initialize map and create advanced markers once the map is loaded
   onMapInitialized(map: google.maps.Map) {
     this.map = map;
@@ -86,7 +96,7 @@ export class HomeComponent implements OnInit {
     // Add click listener to map background to deselect current club
     map.addListener('click', (event: google.maps.MapMouseEvent) => {
       // Only deselect if click wasn't on a marker
-      
+
       this.ngZone.run(() => {
         this.deselectClub();
       });
@@ -153,7 +163,7 @@ export class HomeComponent implements OnInit {
       this.deselectClub();
       return;
     }
-    
+
     this.selectedClubId = club.id;
     this.selectedClub = club;
 
@@ -212,9 +222,17 @@ export class HomeComponent implements OnInit {
 
   // Create HTML content for info window
   createInfoWindowContent(club: Club): string {
+    const mainActivity = this.getMainActivity(club);
+
     return `
       <div class="info-window" style="padding: 10px; max-width: 250px;">
-        <h3 style="margin: 0 0 8px 0; color: #f84c00; font-weight: bold;">${club.name}</h3>
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                    background-image: url('../../assets/activities/${mainActivity}.jpg');
+                    background-size: cover; background-position: center; opacity: 0.7; z-index: -1;"></div>
+        <div style="position: relative; z-index: 1; background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); padding: 10px; border-radius: 6px;">
+        <h3 style="margin: 0 0 8px 0; color: #f84c00; font-weight: bold;">${
+          club.name
+        }</h3>
         <div style="margin-bottom: 5px;">
           ${this.createStarRating(club.rating)}
           <span style="margin-left: 5px;">${club.rating}</span>
@@ -227,7 +245,10 @@ export class HomeComponent implements OnInit {
         }
         <div style="margin: 8px 0;">
           ${club.sportTypes
-            .map((sport) => `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`)
+            .map(
+              (sport) =>
+                `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`
+            )
             .join('')}
         </div>
         <a href="#" style="display: inline-block; background: #f84c00; color: white; padding: 5px 12px; border-radius: 4px; text-decoration: none; margin-top: 5px; font-size: 14px;">View Details</a>
@@ -398,7 +419,7 @@ export class HomeComponent implements OnInit {
       this.deselectClub();
       return;
     }
-    
+
     this.selectedClubId = club.id;
     this.selectedClub = club;
 
