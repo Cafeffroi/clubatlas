@@ -1,0 +1,14 @@
+<div class="location-prompt">
+  <div class="location-prompt-content">
+    <h2 class="text-xl font-bold mb-4">Enable Location Services</h2>
+    <p class="mb-4">Would you like to share your location to see nearby sports clubs and view them on a map?</p>
+    <div class="flex space-x-4">
+      <button (click)="onAccept()" class="bg-[#f84c00] text-white px-4 py-2 rounded hover:bg-[#d94400] transition-colors">
+        Yes, share my location
+      </button>
+      <button (click)="onDecline()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition-colors">
+        No, thanks
+      </button>
+    </div>
+  </div>
+</div>

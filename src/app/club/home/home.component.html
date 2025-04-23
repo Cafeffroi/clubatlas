@@ -1,0 +1,90 @@
+<main class="pt-[68px]">
+  <!-- Push Section -->
+  <section id="push" class="min-h-screen relative flex flex-col items-center justify-center p-8 overflow-hidden">
+    <!-- Background Video -->
+    <video #videoPlayer autoplay muted loop playsinline [style.opacity]="0.8"
+      class="absolute top-0 left-0 w-full h-full object-cover -z-10">
+      <source [src]="videoUrl" type="video/mp4">
+    </video>
+
+    <!-- Dark overlay with gradient -->
+    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/60 via-black/80 to-black -z-10"></div>
+
+    <!-- Content -->
+    <div class="text-center text-white z-10 space-y-8">
+      <h2 class="text-4xl md:text-5xl font-bold mb-4">
+        Libérez le Viking qui est en vous !
+      </h2>
+      <p class="text-xl md:text-2xl mb-8">
+        Une expérience unique de lancer de hache en plein cœur de la ville
+      </p>
+      <a [routerLink]="['/reservation']" i18n
+        class="relative bg-[#f84c00] text-white px-6 py-2 rounded-lg hover:bg-[#d94400] text-lg transition-colors">
+        Réserver
+        <!-- <span class="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shine"></span> -->
+      </a>
+    </div>
+  </section>
+
+  <!-- Presentation Section -->
+  <section id="presentation" class="min-h-screen p-8 bg-black flex flex-col items-center gap-12">
+    <!-- Venue Presentation (Left) -->
+    <div class="w-2/3 flex justify-start">
+      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-[80%]">
+        <h3 class="text-2xl font-semibold mb-3">Discover Our Venue</h3>
+        <p>Step into an immersive axe-throwing experience with a rustic yet modern indoor setting. Whether you're a
+          beginner or a seasoned thrower, our lanes are designed for fun, safety, and competition!</p>
+      </div>
+    </div>
+
+    <!-- Opening Hours (Right) -->
+    <div class="w-2/3 flex justify-end">
+      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-[80%] text-right">
+        <h3 class="text-2xl font-semibold mb-3">Opening Hours</h3>
+        <p>Tuesday to Friday: 18h - 22h<br>Saturday: 11h - 22h</p>
+      </div>
+    </div>
+
+    <!-- Why Come Throw Axes (Left) -->
+    <div class="w-2/3 flex justify-start">
+      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-[80%]">
+        <h3 class="text-2xl font-semibold mb-3">Why Throw Axes?</h3>
+        <p>Unleash your inner warrior! Axe throwing is an exhilarating way to challenge yourself, have fun with friends,
+          and de-stress. Join us for an unforgettable experience!</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Price Section -->
+  <section id="price" class="min-h-screen p-8 bg-gray-200">
+    <app-pricing></app-pricing>
+  </section>
+
+  <!-- Events Section -->
+  <section id="event" class="min-h-screen p-8 bg-gray-900 text-white">
+    <app-event></app-event>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="min-h-screen p-8 bg-gray-200">
+    <app-faq></app-faq>
+  </section>
+
+  <!-- Insta fee Section -->
+  <section id="instafeed" class="min-h-screen p-8 bg-gray-900">
+    <app-instagram-feed></app-instagram-feed>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="min-h-screen p-8 bg-gray-200">
+    <app-contact></app-contact>
+  </section>
+</main>
+
+<!-- Back to Top Button -->
+<button *ngIf="showBackToTop" (click)="scrollToTop()"
+  class="fixed bottom-8 right-8 bg-[#f84c00] text-white p-4 rounded-full shadow-lg hover:bg-[#d94400] transition-colors cursor-pointer"
+  aria-label="Back to top">
+  ↑
+</button>

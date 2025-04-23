@@ -1,0 +1,80 @@
+<div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12">Nos Tarifs</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Card 1 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+        <div class="h-48 relative">
+          <img 
+            src="../../assets/one_hour_session_400_320.png" 
+            alt="Séance individuelle" 
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex-grow">
+            <h3 class="text-xl font-bold mb-2">Séance d'1 heure</h3>
+            <p class="text-gray-600 font-medium mb-2">1 à 4 personnes</p>
+            <p class="text-gray-700 mb-4">Réserver votre piste pour 1 heure</p>
+            <div class="space-y-1">
+              <p class="font-semibold">1 personne: <span class="text-[#f84c00]">20€</span></p>
+              <p class="font-semibold">2+ personnes: <span class="text-[#f84c00]">15€</span>/personne</p>
+            </div>
+          </div>
+          <a [routerLink]="['/reservation']" 
+             class="mt-6 block text-center bg-[#f84c00] text-white px-6 py-2 rounded-lg hover:bg-[#d94400] transition-colors">
+            Réserver
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+        <div class="h-48 relative">
+          <img 
+            src="../../assets/privatisation_400_320.png" 
+            alt="Privatisation" 
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex-grow">
+            <h3 class="text-xl font-bold mb-2">Privatisation</h3>
+            <p class="text-gray-600 font-medium mb-2">8 à 16 personnes</p>
+            <p class="text-gray-700 mb-4">Réserver le centre (4 personnes par piste maximum) pour un team building, un EVJG / EVJF</p>
+            <p class="font-semibold">
+              <span class="text-[#f84c00]">280€</span> / heure
+            </p>
+          </div>
+          <a [routerLink]="['/reservation']" 
+             class="mt-6 block text-center bg-[#f84c00] text-white px-6 py-2 rounded-lg hover:bg-[#d94400] transition-colors">
+            Réserver
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+        <div class="h-48 relative">
+          <img 
+            src="../../assets/privatisation_400_320.png" 
+            alt="Ligue et tournoi" 
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex-grow">
+            <h3 class="text-xl font-bold mb-2">Ligue et tournoi</h3>
+            <p class="text-gray-700 mb-4">Participer à nos ligues et tournois</p>
+            <p class="font-semibold">
+              <span class="text-[#f84c00]">130€</span> / saison (8 semaines)
+            </p>
+          </div>
+          <a [routerLink]="['/reservation']" 
+             class="mt-6 block text-center bg-[#f84c00] text-white px-6 py-2 rounded-lg hover:bg-[#d94400] transition-colors">
+            S'inscrire
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>

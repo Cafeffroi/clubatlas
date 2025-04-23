@@ -1,0 +1,72 @@
+<div class="container mx-auto px-4 py-12">
+  <!-- Intro Text -->
+  <div class="mb-12 flex justify-center items-center">
+    <!-- Intro Text -->
+    <p class="text-center text-lg text-gray-700 mb-8 w-2/3">
+      Laissez-nous savoir si vous désirez modifier ou annuler votre réservation, signaler un problème technique ou si vous avez des questions/commentaires concernant notre centre.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Contact Form -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-6" i18n>Nous contacter</h2>
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1" i18n>Nom</label>
+          <input
+            type="text"
+            formControlName="name"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" i18n>Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" i18n>Message</label>
+          <textarea
+            formControlName="message"
+            rows="4"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          ></textarea>
+        </div>
+        <button
+          type="submit" i18n
+          [disabled]="!contactForm.valid"
+          class="w-full py-2 px-4 bg-[#f84c00] hover:bg-[#d94400] text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+        >
+          Envoyer
+        </button>
+      </form>
+    </div>
+
+    <!-- Address & Opening Hours -->
+    <div class="bg-gray-800 text-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center">
+      <h3 class="text-2xl font-semibold mb-4">Notre Adresse</h3>
+      <p class="text-lg">123 Rue des Vikings<br>75000 Paris, France</p>
+
+      <h3 class="text-2xl font-semibold mt-6 mb-4">Horaires d'ouverture</h3>
+      <p class="text-lg">
+        Mardi - Vendredi: 18h - 22h<br>
+        Samedi: 11h - 22h
+      </p>
+    </div>
+
+    <!-- Map -->
+    <div class="h-[400px] bg-gray-100 rounded-lg shadow-lg">
+      <iframe
+        [src]="mapUrl | safe"
+        width="100%"
+        height="100%"
+        class="rounded-lg"
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+</div>
