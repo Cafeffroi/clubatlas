@@ -2,18 +2,18 @@
 
 ## Activité principale
 
-10h - 15h : Stream
-15h - 16h : Contenu + Dej
-16h - 21h : Family + Montage videos (tiktok, youtube)
-21h - 22h : Sport
+- 10h - 15h : Stream
+- 15h - 16h : Contenu + Dej
+- 16h - 21h : Family + Montage videos (tiktok, youtube)
+- 21h - 22h : Sport
 
 ## Projets en plus
 
-site web clubs de sport
-etsy paracord / impression 3D
-app (trouver idée)
-BarbX
-Stable Diffusion
+- site web clubs de sport
+- etsy paracord / impression 3D
+- app (trouver idée)
+- BarbX
+- Stable Diffusion : dinah might
 
 ## Prérequis :
 
@@ -32,7 +32,7 @@ Je profite de la sortie de Dune Awakening pour me lancer sur Twitch. Grand fan d
   - cut microphone
   - change scenes (game <-> chat)
 
-
+- [ ] fichier dépenses (60e streamdeck)
 
 # Club Atlas
 
