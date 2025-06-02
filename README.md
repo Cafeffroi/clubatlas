@@ -1,3 +1,39 @@
+# Escape plan
+
+## Activité principale
+
+10h - 15h : Stream
+15h - 16h : Contenu + Dej
+16h - 21h : Family + Montage videos (tiktok, youtube)
+21h - 22h : Sport
+
+## Projets en plus
+
+site web clubs de sport
+etsy paracord / impression 3D
+app (trouver idée)
+BarbX
+Stable Diffusion
+
+## Prérequis :
+
+- [ ] préparer scenes twitch - écrire bio https://pika.art/library
+
+Bienvenue ! J'ai 40 ans, 3 enfants et pas beaucoup de temps.
+Je profite de la sortie de Dune Awakening pour me lancer sur Twitch. Grand fan de Dune (et de la sci fi et fantasy en général) et gamer depuis 30 ans. 
+
+- [ ] finir décor de stream + commencer a stream régulièrement
+- [ ] ouvrir boutique etsy (happy-mess)
+- [ ] continuer site web
+- [ ] création micro entreprise : TheFrenchGoose / Tchak 
+
+- [ ] streamdeck actions
+  - hide webcam
+  - cut microphone
+  - change scenes (game <-> chat)
+
+
+
 # Club Atlas
 
 The purpose of this project is to provide a website to facilitate searching a sport club in your region.
