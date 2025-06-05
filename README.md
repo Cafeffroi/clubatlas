@@ -17,20 +17,20 @@
 
 ## Prérequis :
 
-- [ ] préparer scenes twitch - écrire bio https://pika.art/library
-
-Bienvenue ! J'ai 40 ans, 3 enfants et pas beaucoup de temps.
-Je profite de la sortie de Dune Awakening pour me lancer sur Twitch. Grand fan de Dune (et de la sci fi et fantasy en général) et gamer depuis 30 ans. 
-
-- [ ] finir décor de stream + commencer a stream régulièrement
+- [ ] préparer scenes twitch
+- [x] finir décor de stream
+- [ ] commencer a stream régulièrement
 - [ ] ouvrir boutique etsy (happy-mess)
 - [ ] continuer site web
 - [ ] création micro entreprise : TheFrenchGoose / Tchak 
+
+C'est mon 1er stream. Dune Awakening. 400h sur la closed beta, si vous avez des questions !
 
 - [ ] streamdeck actions
   - hide webcam
   - cut microphone
   - change scenes (game <-> chat)
+  - clip twitch
 
 - [ ] fichier dépenses (60e streamdeck)
 
