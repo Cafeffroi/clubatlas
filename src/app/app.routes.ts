@@ -4,5 +4,6 @@ import { ClubComponent } from './club/club.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'club', component: ClubComponent }
+  { path: 'club/:slug', component: ClubComponent },
+  { path: '**', redirectTo: '' },
 ];

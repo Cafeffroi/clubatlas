@@ -1,36 +1,15 @@
-# Escape plan
+# Todo
 
-## Activité principale
-
-- 10h - 15h : Stream
-- 15h - 16h : Contenu + Dej
-- 16h - 21h : Family + Montage videos (tiktok, youtube)
-- 21h - 22h : Sport
+- [ ] Title
 
 ## Projets en plus
 
-- site web clubs de sport
-- etsy paracord / impression 3D
-- app (trouver idée)
 - BarbX
-- Stable Diffusion : dinah might
 
 ## Prérequis :
 
-- [ ] préparer scenes twitch
-- [x] finir décor de stream
-- [ ] commencer a stream régulièrement
-- [ ] ouvrir boutique etsy (happy-mess)
 - [ ] continuer site web
-- [ ] création micro entreprise : TheFrenchGoose / Tchak 
-
-C'est mon 1er stream. Dune Awakening. 400h sur la closed beta, si vous avez des questions !
-
-- [ ] streamdeck actions
-  - hide webcam
-  - cut microphone
-  - change scenes (game <-> chat)
-  - clip twitch
+- [ ] création micro entreprise : TheFrenchGoose / Tchak / Impact Labs
 
 - [ ] fichier dépenses (60e streamdeck)
 
@@ -39,8 +18,6 @@ C'est mon 1er stream. Dune Awakening. 400h sur la closed beta, si vous avez des 
 The purpose of this project is to provide a website to facilitate searching a sport club in your region.
 
 It's also a template generator and host for sport clubs who would want a nice presentation of their activity to share on the net and social medias.
-
-
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
 

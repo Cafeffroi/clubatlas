@@ -1,3 +1,14 @@
-<app-header></app-header>
-<app-club-home></app-club-home>
-<app-footer></app-footer>
+<ng-container *ngIf="club; else notFound">
+  <app-header [club]="club"></app-header>
+  <app-club-home [club]="club"></app-club-home>
+  <app-footer [club]="club"></app-footer>
+</ng-container>
+
+<ng-template #notFound>
+  <div class="min-h-screen flex flex-col items-center justify-center gap-4">
+    <p class="text-xl">Ce club n'existe pas.</p>
+    <a [routerLink]="['/']" class="text-[#f84c00] underline"
+      >Retour à la recherche</a
+    >
+  </div>
+</ng-template>

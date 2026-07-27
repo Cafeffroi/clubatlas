@@ -142,7 +142,8 @@
     <div class="clubs-grid">
       <div
         *ngFor="let club of clubs"
-        class="club-card"
+        class="club-card cursor-pointer"
+        (click)="openClubDetails(club)"
         [style.background-image]="
           'url(../../assets/activities/' + getMainActivity(club) + '.png)'
         "

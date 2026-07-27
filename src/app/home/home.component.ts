@@ -7,24 +7,9 @@ import {
 } from '@angular/google-maps';
 import { HeaderComponent } from './header/header.component';
 import { environment } from '../../environments/environment';
-
-interface Club {
-  id: number;
-  name: string;
-  address: string;
-  distance?: string; // Only available when location is shared
-  sportTypes: string[];
-  photo: string;
-  openingHours: {
-    days: string;
-    hours: string;
-  }[];
-  rating: number;
-  position: {
-    lat: number;
-    lng: number;
-  };
-}
+import { Router } from '@angular/router';
+import { Club } from '../models/club.model';
+import { ClubService } from '../services/club.service';
 
 @Component({
   selector: 'app-home',
@@ -62,11 +47,14 @@ export class HomeComponent implements OnInit {
     mapId: environment.googleMaps.mapId,
   };
 
-  constructor(private ngZone: NgZone) {}
+  constructor(
+    private ngZone: NgZone,
+    private router: Router,
+    private clubService: ClubService,
+  ) {}
 
   ngOnInit() {
-    // Mock data for clubs - in a real app, you would fetch this from an API
-    this.loadMockClubs();
+    this.clubs = this.clubService.getClubs();
 
     // Check if user has already made a location choice
     const locationChoice = localStorage.getItem('locationConsent');
@@ -98,6 +86,10 @@ export class HomeComponent implements OnInit {
     });
 
     this.createAdvancedMarkers();
+  }
+
+  openClubDetails(club: Club) {
+    this.router.navigate(['/club', club.slug]);
   }
 
   // Create advanced markers for each club
@@ -183,16 +175,22 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // Show the info window for a club
   showInfoWindow(club: Club) {
     if (!this.map) return;
 
-    // Close any existing info window
     this.closeActiveInfoWindow();
 
-    // Create an info window
+    const container = document.createElement('div');
+    container.innerHTML = this.createInfoWindowContent(club);
+    container
+      .querySelector('[data-view-details]')
+      ?.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.ngZone.run(() => this.openClubDetails(club));
+      });
+
     const infoWindow = new google.maps.InfoWindow({
-      content: this.createInfoWindowContent(club),
+      content: container,
       position: new google.maps.LatLng(club.position.lat, club.position.lng),
     });
 
@@ -243,7 +241,7 @@ export class HomeComponent implements OnInit {
             )
             .join('')}
         </div>
-        <a href="#" style="display: inline-block; background: #f84c00; color: white; padding: 5px 12px; border-radius: 4px; text-decoration: none; margin-top: 5px; font-size: 14px;">View Details</a>
+        <a href="#" data-view-details style="display: inline-block; background: #f84c00; color: white; padding: 5px 12px; border-radius: 4px; text-decoration: none; margin-top: 5px; font-size: 14px;">View Details</a>
       </div>
     </div>
   `;
@@ -478,91 +476,5 @@ export class HomeComponent implements OnInit {
       this.advancedMarkers.clear();
       this.closeActiveInfoWindow();
     }
-  }
-
-  // Load mock data for clubs
-  loadMockClubs() {
-    this.clubs = [
-      {
-        id: 1,
-        name: 'Fitness Club Paris',
-        address: '123 Rue de Rivoli, 75001 Paris',
-        sportTypes: ['Fitness', 'Yoga', 'Pilates'],
-        photo: 'assets/club1.jpg',
-        openingHours: [
-          { days: 'Mon-Fri', hours: '6:00-22:00' },
-          { days: 'Sat-Sun', hours: '8:00-20:00' },
-        ],
-        rating: 4.5,
-        position: { lat: 48.8624, lng: 2.3385 },
-      },
-      {
-        id: 2,
-        name: 'Tennis Club Roland Garros',
-        address: '2 Avenue Gordon Bennett, 75016 Paris',
-        sportTypes: ['Tennis'],
-        photo: 'assets/club2.jpg',
-        openingHours: [
-          { days: 'Mon-Fri', hours: '9:00-21:00' },
-          { days: 'Sat', hours: '9:00-18:00' },
-          { days: 'Sun', hours: '10:00-16:00' },
-        ],
-        rating: 4.8,
-        position: { lat: 48.8473, lng: 2.2526 },
-      },
-      {
-        id: 3,
-        name: 'Aqua Swimming Club',
-        address: '10 Rue du Faubourg Poissonnière, 75010 Paris',
-        sportTypes: ['Swimming', 'Water Polo'],
-        photo: 'assets/club3.jpg',
-        openingHours: [
-          { days: 'Mon-Fri', hours: '7:00-21:00' },
-          { days: 'Sat-Sun', hours: '8:00-18:00' },
-        ],
-        rating: 4.2,
-        position: { lat: 48.8724, lng: 2.3476 },
-      },
-      {
-        id: 4,
-        name: 'Paris Basketball Academy',
-        address: '35 Rue des Archives, 75004 Paris',
-        sportTypes: ['Basketball'],
-        photo: 'assets/club4.jpg',
-        openingHours: [
-          { days: 'Mon-Fri', hours: '14:00-22:00' },
-          { days: 'Sat', hours: '10:00-18:00' },
-        ],
-        rating: 4.0,
-        position: { lat: 48.8583, lng: 2.3553 },
-      },
-      {
-        id: 5,
-        name: 'Urban Soccer 5',
-        address: '168 Quai de Jemmapes, 75010 Paris',
-        sportTypes: ['Soccer', 'Futsal'],
-        photo: 'assets/club5.jpg',
-        openingHours: [
-          { days: 'Mon-Fri', hours: '12:00-23:00' },
-          { days: 'Sat-Sun', hours: '10:00-22:00' },
-        ],
-        rating: 4.6,
-        position: { lat: 48.8721, lng: 2.3652 },
-      },
-      {
-        id: 6,
-        name: 'Crossfit Louvre',
-        address: '15 Rue Montmartre, 75001 Paris',
-        sportTypes: ['Crossfit', 'HIIT'],
-        photo: 'assets/club6.jpg',
-        openingHours: [
-          { days: 'Mon-Fri', hours: '6:30-21:30' },
-          { days: 'Sat', hours: '9:00-17:00' },
-          { days: 'Sun', hours: '10:00-15:00' },
-        ],
-        rating: 4.7,
-        position: { lat: 48.8634, lng: 2.3488 },
-      },
-    ];
   }
 }

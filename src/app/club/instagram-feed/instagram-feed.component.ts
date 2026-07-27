@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 interface InstagramMedia {
   id: number;
@@ -19,6 +19,8 @@ interface InstagramMedia {
 export class InstagramFeedComponent implements OnInit, OnDestroy {
   currentIndex = 0;
   private intervalId: any;
+
+  @Input({ required: true }) handle!: string;
 
   mediaItems: InstagramMedia[] = [
     {
