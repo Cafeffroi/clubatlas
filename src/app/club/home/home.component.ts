@@ -10,17 +10,26 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-club-home',
-  imports: [CommonModule, RouterModule, ContactComponent, FaqComponent,
-     PricingComponent, EventComponent, InstagramFeedComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ContactComponent,
+    FaqComponent,
+    PricingComponent,
+    EventComponent,
+    InstagramFeedComponent,
+  ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
 })
 export class HomeComponent {
   showBackToTop = false;
   videoUrl: SafeResourceUrl;
 
   constructor(private sanitizer: DomSanitizer) {
-    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('../../assets/push_video.mp4');
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      'assets/push_video.mp4',
+    );
   }
 
   @HostListener('window:scroll')
@@ -31,7 +40,7 @@ export class HomeComponent {
   scrollToTop() {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }
 }

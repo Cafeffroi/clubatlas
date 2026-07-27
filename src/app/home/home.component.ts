@@ -6,6 +6,7 @@ import {
   MapMarker,
 } from '@angular/google-maps';
 import { HeaderComponent } from './header/header.component';
+import { environment } from '../../environments/environment';
 
 interface Club {
   id: number;
@@ -37,6 +38,7 @@ export class HomeComponent implements OnInit {
 
   // State management
   locationShared: boolean | null = null;
+  viewMode: 'map' | 'grid' = 'map';
   isLoadingLocation: boolean = false;
   showLocationPrompt: boolean = true;
 
@@ -57,7 +59,7 @@ export class HomeComponent implements OnInit {
   mapOptions: google.maps.MapOptions = {
     center: { lat: 48.8566, lng: 2.3522 }, // Default to Paris
     zoom: 12,
-    mapId: 'DEMO_MAP_ID', // You should use your own Map ID here
+    mapId: environment.googleMaps.mapId,
   };
 
   constructor(private ngZone: NgZone) {}
@@ -88,23 +90,14 @@ export class HomeComponent implements OnInit {
     return 'fitness';
   }
 
-  // Initialize map and create advanced markers once the map is loaded
   onMapInitialized(map: google.maps.Map) {
     this.map = map;
 
-    // Add click listener to map background to deselect current club
-    map.addListener('click', (event: google.maps.MapMouseEvent) => {
-      // Only deselect if click wasn't on a marker
-
-      this.ngZone.run(() => {
-        this.deselectClub();
-      });
+    map.addListener('click', () => {
+      this.ngZone.run(() => this.deselectClub());
     });
 
-    // Now that we have the map instance, we can create advanced markers
-    if (this.locationShared) {
-      this.createAdvancedMarkers();
-    }
+    this.createAdvancedMarkers();
   }
 
   // Create advanced markers for each club
@@ -126,7 +119,7 @@ export class HomeComponent implements OnInit {
       // Create a marker
       const position = new google.maps.LatLng(
         club.position.lat,
-        club.position.lng
+        club.position.lng,
       );
       const markerOptions: google.maps.marker.AdvancedMarkerElementOptions = {
         map: this.map,
@@ -135,7 +128,7 @@ export class HomeComponent implements OnInit {
       };
 
       const marker = new google.maps.marker.AdvancedMarkerElement(
-        markerOptions
+        markerOptions,
       );
 
       // Store the marker with club ID as key
@@ -226,7 +219,7 @@ export class HomeComponent implements OnInit {
     return `
       <div class="info-window" style="padding: 10px; max-width: 250px;">
       <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                    background-image: url('../../assets/activities/${mainActivity}.png');
+                    background-image: url('assets/activities/${mainActivity}.png');
                     background-size: cover; background-position: center; opacity: 0.7; z-index: -1;"></div>
         <div style="position: relative; z-index: 1; background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); padding: 10px; border-radius: 6px;">
         <h3 style="margin: 0 0 8px 0; color: #f84c00; font-weight: bold;">${
@@ -246,13 +239,14 @@ export class HomeComponent implements OnInit {
           ${club.sportTypes
             .map(
               (sport) =>
-                `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`
+                `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`,
             )
             .join('')}
         </div>
         <a href="#" style="display: inline-block; background: #f84c00; color: white; padding: 5px 12px; border-radius: 4px; text-decoration: none; margin-top: 5px; font-size: 14px;">View Details</a>
       </div>
-    `;
+    </div>
+  `;
   }
 
   // Create HTML for star rating
@@ -346,14 +340,14 @@ export class HomeComponent implements OnInit {
           }
         },
         (error) => {
-          console.error('Error getting location:', error);
+          console.warn('Geolocation unavailable:', error.message);
           this.locationShared = false;
           this.isLoadingLocation = false;
-        }
+          localStorage.setItem('locationConsent', 'false');
+        },
       );
     } else {
       console.error('Geolocation not supported by this browser');
-      this.locationShared = false;
       this.isLoadingLocation = false;
     }
   }
@@ -365,7 +359,7 @@ export class HomeComponent implements OnInit {
         userLocation.lat,
         userLocation.lng,
         club.position.lat,
-        club.position.lng
+        club.position.lng,
       );
       club.distance =
         distance < 1
@@ -447,10 +441,10 @@ export class HomeComponent implements OnInit {
           this.clubs.sort((a, b) => {
             // Extract numeric value from distance string
             const distA = parseFloat(
-              a.distance!.replace(' km', '').replace(' m', '')
+              a.distance!.replace(' km', '').replace(' m', ''),
             );
             const distB = parseFloat(
-              b.distance!.replace(' km', '').replace(' m', '')
+              b.distance!.replace(' km', '').replace(' m', ''),
             );
 
             // Convert to same unit (km)
@@ -476,22 +470,13 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // Handle the toggle view event from the header
   toggleViewMode() {
-    // Toggle the locationShared value
-    this.locationShared = !this.locationShared;
+    this.viewMode = this.viewMode === 'map' ? 'grid' : 'map';
 
-    // If switching to map view, we need location data
-    if (this.locationShared && !this.clubs[0].distance) {
-      this.getUserLocation();
-    }
-
-    // If the map is already initialized and we're switching to map view
-    if (this.locationShared && this.map) {
-      // Ensure markers are created
-      setTimeout(() => {
-        this.createAdvancedMarkers();
-      }, 100);
+    if (this.viewMode === 'grid') {
+      this.map = null;
+      this.advancedMarkers.clear();
+      this.closeActiveInfoWindow();
     }
   }
 
@@ -503,7 +488,7 @@ export class HomeComponent implements OnInit {
         name: 'Fitness Club Paris',
         address: '123 Rue de Rivoli, 75001 Paris',
         sportTypes: ['Fitness', 'Yoga', 'Pilates'],
-        photo: '../../assets/club1.jpg',
+        photo: 'assets/club1.jpg',
         openingHours: [
           { days: 'Mon-Fri', hours: '6:00-22:00' },
           { days: 'Sat-Sun', hours: '8:00-20:00' },
@@ -516,7 +501,7 @@ export class HomeComponent implements OnInit {
         name: 'Tennis Club Roland Garros',
         address: '2 Avenue Gordon Bennett, 75016 Paris',
         sportTypes: ['Tennis'],
-        photo: '../../assets/club2.jpg',
+        photo: 'assets/club2.jpg',
         openingHours: [
           { days: 'Mon-Fri', hours: '9:00-21:00' },
           { days: 'Sat', hours: '9:00-18:00' },
@@ -530,7 +515,7 @@ export class HomeComponent implements OnInit {
         name: 'Aqua Swimming Club',
         address: '10 Rue du Faubourg Poissonnière, 75010 Paris',
         sportTypes: ['Swimming', 'Water Polo'],
-        photo: '../../assets/club3.jpg',
+        photo: 'assets/club3.jpg',
         openingHours: [
           { days: 'Mon-Fri', hours: '7:00-21:00' },
           { days: 'Sat-Sun', hours: '8:00-18:00' },
@@ -543,7 +528,7 @@ export class HomeComponent implements OnInit {
         name: 'Paris Basketball Academy',
         address: '35 Rue des Archives, 75004 Paris',
         sportTypes: ['Basketball'],
-        photo: '../../assets/club4.jpg',
+        photo: 'assets/club4.jpg',
         openingHours: [
           { days: 'Mon-Fri', hours: '14:00-22:00' },
           { days: 'Sat', hours: '10:00-18:00' },
@@ -556,7 +541,7 @@ export class HomeComponent implements OnInit {
         name: 'Urban Soccer 5',
         address: '168 Quai de Jemmapes, 75010 Paris',
         sportTypes: ['Soccer', 'Futsal'],
-        photo: '../../assets/club5.jpg',
+        photo: 'assets/club5.jpg',
         openingHours: [
           { days: 'Mon-Fri', hours: '12:00-23:00' },
           { days: 'Sat-Sun', hours: '10:00-22:00' },
@@ -569,7 +554,7 @@ export class HomeComponent implements OnInit {
         name: 'Crossfit Louvre',
         address: '15 Rue Montmartre, 75001 Paris',
         sportTypes: ['Crossfit', 'HIIT'],
-        photo: '../../assets/club6.jpg',
+        photo: 'assets/club6.jpg',
         openingHours: [
           { days: 'Mon-Fri', hours: '6:30-21:30' },
           { days: 'Sat', hours: '9:00-17:00' },

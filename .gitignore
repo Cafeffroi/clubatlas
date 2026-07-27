@@ -1,3 +1,6 @@
 node_modules
 .angular
 .editorconfig
+/dist
+/.env
+/src/environments/environment.ts

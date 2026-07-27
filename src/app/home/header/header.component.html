@@ -12,7 +12,7 @@
           class="flex items-center"
         >
           <img
-            src="../../../assets/clubatlas.png"
+            src="../assets/clubatlas.png"
             alt="Logo"
             class="w-[50px] h-[50px]"
           />
@@ -51,12 +51,7 @@
               <div class="mb-2">
                 <label class="block text-sm font-medium mb-1">Address</label>
                 <div class="relative">
-                  <input
-                    #locationInput
-                    type="text"
-                    placeholder="Enter location"
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]"
-                  />
+                  <div #locationHost class="w-full"></div>
                   <button
                     *ngIf="locationEntered"
                     (click)="clearLocation()"
@@ -243,12 +238,7 @@
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Where</label>
         <div class="relative">
-          <input
-            #mobileLocationInput
-            type="text"
-            placeholder="Enter location"
-            class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#f84c00]"
-          />
+          <div #mobileLocationHost class="w-full"></div>
           <button
             *ngIf="locationEntered"
             (click)="clearLocation(true)"

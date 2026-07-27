@@ -32,8 +32,8 @@
     <p>Getting your location...</p>
   </div>
 
-  <!-- Map View (when location is shared) -->
-  <div *ngIf="locationShared === true" class="map-view">
+  <!-- Map View -->
+  <div *ngIf="viewMode === 'map'" class="map-view">
     <!-- Left sidebar with clubs list -->
     <div class="clubs-sidebar">
       <div class="flex justify-between items-center mb-4">
@@ -43,7 +43,9 @@
             (change)="sortClubs($event)"
             class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-[#f84c00] focus:border-[#f84c00]"
           >
-            <option value="distance">Sort by Distance</option>
+            <option *ngIf="locationShared" value="distance">
+              Sort by Distance
+            </option>
             <option value="rating">Sort by Rating</option>
             <option value="activity">Sort by Activity</option>
           </select>
@@ -121,8 +123,8 @@
     </div>
   </div>
 
-  <!-- Grid View (when location is not shared) -->
-  <div *ngIf="locationShared === false" class="grid-view">
+  <!-- Grid View -->
+  <div *ngIf="viewMode === 'grid'" class="grid-view">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Sports Clubs</h2>
       <div class="sort-dropdown">
