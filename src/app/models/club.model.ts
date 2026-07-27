@@ -1,3 +1,17 @@
+export type WeekDay = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
+export type DayPeriod = 'Morning' | 'Afternoon' | 'Evening';
+
+export interface TrainingSlot {
+  day: WeekDay;
+  period: DayPeriod;
+}
+
+export interface SearchCriteria {
+  sports: string[];
+  days: WeekDay[];
+  times: DayPeriod[];
+}
+
 export interface OpeningHours {
   days: string;
   hours: string;
@@ -45,6 +59,7 @@ export interface Club {
   presentation: string;
   whyJoin: string;
   openingHours: OpeningHours[];
+  schedule: TrainingSlot[];
   pricing: PricingPlan[];
   events: ClubEvent[];
   faq: FaqItem[];

@@ -1,4 +1,7 @@
-<app-header (toggleView)="toggleViewMode()"></app-header>
+<app-header
+  (toggleView)="toggleViewMode()"
+  (searchSubmit)="onSearch($event)"
+></app-header>
 
 <div class="clubs-page-container">
   <!-- Location permission popup -->
@@ -139,7 +142,7 @@
     </div>
 
     <!-- Club cards grid -->
-    <div class="clubs-grid">
+    <div *ngIf="clubs.length > 0" class="clubs-grid">
       <div
         *ngFor="let club of clubs"
         class="club-card cursor-pointer"
@@ -180,6 +183,10 @@
           </div>
         </div>
       </div>
+    </div>
+    <div *ngIf="clubs.length === 0" class="text-center p-12 text-gray-500">
+      <i class="fas fa-search text-4xl mb-3"></i>
+      <p>No clubs found. Try changing your search criteria.</p>
     </div>
   </div>
 </div>

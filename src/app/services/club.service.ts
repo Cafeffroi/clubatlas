@@ -1,5 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Club, ClubEvent, FaqItem, PricingPlan } from '../models/club.model';
+import {
+  Club,
+  ClubEvent,
+  DayPeriod,
+  FaqItem,
+  PricingPlan,
+  SearchCriteria,
+  TrainingSlot,
+  WeekDay,
+} from '../models/club.model';
 
 function pricingFor(sport: string): PricingPlan[] {
   return [
@@ -81,6 +90,24 @@ function faqFor(name: string): FaqItem[] {
   ];
 }
 
+function slots(days: WeekDay[], periods: DayPeriod[]): TrainingSlot[] {
+  return days.flatMap((day) => periods.map((period) => ({ day, period })));
+}
+
+function matchesSports(club: Club, sports: string[]): boolean {
+  if (sports.length === 0) return true;
+  return club.sportTypes.some((sport) => sports.includes(sport));
+}
+
+function matchesSchedule(club: Club, criteria: SearchCriteria): boolean {
+  if (criteria.days.length === 0 && criteria.times.length === 0) return true;
+  return club.schedule.some(
+    (slot) =>
+      (criteria.days.length === 0 || criteria.days.includes(slot.day)) &&
+      (criteria.times.length === 0 || criteria.times.includes(slot.period)),
+  );
+}
+
 @Injectable({ providedIn: 'root' })
 export class ClubService {
   private readonly clubs: Club[] = [
@@ -103,6 +130,13 @@ export class ClubService {
         { days: 'Lundi - Vendredi', hours: '6h00 - 22h00' },
         { days: 'Samedi - Dimanche', hours: '8h00 - 20h00' },
       ],
+      schedule: [
+        ...slots(
+          ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+          ['Morning', 'Afternoon', 'Evening'],
+        ),
+        ...slots(['Sat', 'Sun'], ['Morning', 'Afternoon']),
+      ],
       pricing: pricingFor('fitness'),
       events: eventsFor('fitness'),
       faq: faqFor('Fitness Club Paris'),
@@ -121,5 +155,16 @@ export class ClubService {
 
   getClubBySlug(slug: string): Club | undefined {
     return this.clubs.find((club) => club.slug === slug);
+  }
+
+  getSportTypes(): string[] {
+    return [...new Set(this.clubs.flatMap((club) => club.sportTypes))].sort();
+  }
+
+  search(criteria: SearchCriteria): Club[] {
+    return this.clubs.filter(
+      (club) =>
+        matchesSports(club, criteria.sports) && matchesSchedule(club, criteria),
+    );
   }
 }

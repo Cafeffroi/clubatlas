@@ -12,7 +12,14 @@ import {
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-// Import Google Maps types
+import {
+  Club,
+  DayPeriod,
+  SearchCriteria,
+  WeekDay,
+} from '../../models/club.model';
+import { ClubService } from '../../services/club.service';
+
 declare var google: any;
 
 @Component({
@@ -29,13 +36,13 @@ export class HeaderComponent implements OnInit {
   userDropdownOpen = false;
   mobileSearchOpen = false;
 
-  // Day selection options
-  weekDays: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  selectedDays: string[] = [];
+  weekDays: WeekDay[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  timesOfDay: DayPeriod[] = ['Morning', 'Afternoon', 'Evening'];
 
-  // Time of day options
-  timesOfDay: string[] = ['Morning', 'Afternoon', 'Evening'];
-  selectedTimes: string[] = [];
+  sportTypes: string[] = [];
+  selectedSports: string[] = [];
+  selectedDays: WeekDay[] = [];
+  selectedTimes: DayPeriod[] = [];
 
   // Map and location related properties
   private autocompletes = new Map<boolean, Promise<any>>();
@@ -64,12 +71,16 @@ export class HeaderComponent implements OnInit {
   // Radius options
   radiusOptions = [1, 5, 10, 25, 50];
 
+  @Output() searchSubmit = new EventEmitter<SearchCriteria>();
+
   constructor(
     private router: Router,
     private ngZone: NgZone,
+    private clubService: ClubService,
   ) {}
 
   ngOnInit(): void {
+    this.sportTypes = this.clubService.getSportTypes();
     document.addEventListener('click', this.onDocumentClick);
   }
 
@@ -285,24 +296,25 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  // Toggle day selection
-  toggleDay(day: string): void {
-    const index = this.selectedDays.indexOf(day);
+  private toggle<T>(list: T[], value: T): void {
+    const index = list.indexOf(value);
     if (index === -1) {
-      this.selectedDays.push(day);
+      list.push(value);
     } else {
-      this.selectedDays.splice(index, 1);
+      list.splice(index, 1);
     }
   }
 
-  // Toggle time of day selection
-  toggleTimeOfDay(timeOfDay: string): void {
-    const index = this.selectedTimes.indexOf(timeOfDay);
-    if (index === -1) {
-      this.selectedTimes.push(timeOfDay);
-    } else {
-      this.selectedTimes.splice(index, 1);
-    }
+  toggleSport(sport: string): void {
+    this.toggle(this.selectedSports, sport);
+  }
+
+  toggleDay(day: WeekDay): void {
+    this.toggle(this.selectedDays, day);
+  }
+
+  toggleTimeOfDay(period: DayPeriod): void {
+    this.toggle(this.selectedTimes, period);
   }
 
   // Scroll to top when clicking the logo
@@ -313,6 +325,17 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  get sportsLabel(): string {
+    if (this.selectedSports.length === 0) return 'Sport type';
+    if (this.selectedSports.length === 1) return this.selectedSports[0];
+    return `${this.selectedSports.length} sports`;
+  }
+
+  get whenLabel(): string {
+    const parts = [...this.selectedDays, ...this.selectedTimes];
+    return parts.length ? parts.join(', ') : 'Training time';
+  }
+
   // Close all dropdowns when scrolling
   @HostListener('window:scroll')
   onWindowScroll(): void {
@@ -320,19 +343,13 @@ export class HeaderComponent implements OnInit {
     this.userDropdownOpen = false;
   }
 
-  // Perform search
   search(): void {
-    // Implement search functionality here
-    console.log('Search with:', {
-      location: this.selectedLocation
-        ? this.selectedLocation.formattedAddress
-        : null,
-      radius: this.searchRadius,
-      days: this.selectedDays,
-      times: this.selectedTimes,
+    this.searchSubmit.emit({
+      sports: [...this.selectedSports],
+      days: [...this.selectedDays],
+      times: [...this.selectedTimes],
     });
 
-    // Close dropdown after search
     this.activeDropdown = null;
     this.mobileSearchOpen = false;
   }

@@ -8,7 +8,7 @@ import {
 import { HeaderComponent } from './header/header.component';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { Club } from '../models/club.model';
+import { Club, SearchCriteria } from '../models/club.model';
 import { ClubService } from '../services/club.service';
 
 @Component({
@@ -28,6 +28,7 @@ export class HomeComponent implements OnInit {
   showLocationPrompt: boolean = true;
 
   // Clubs data
+  allClubs: Club[] = [];
   clubs: Club[] = [];
   selectedClubId: number | null = null;
   selectedClub: Club | null = null;
@@ -54,7 +55,8 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.clubs = this.clubService.getClubs();
+    this.allClubs = this.clubService.getClubs();
+    this.clubs = this.allClubs;
 
     // Check if user has already made a location choice
     const locationChoice = localStorage.getItem('locationConsent');
@@ -65,6 +67,15 @@ export class HomeComponent implements OnInit {
       if (this.locationShared) {
         this.getUserLocation();
       }
+    }
+  }
+
+  onSearch(criteria: SearchCriteria) {
+    this.clubs = this.clubService.search(criteria);
+    this.deselectClub();
+
+    if (this.map) {
+      this.createAdvancedMarkers();
     }
   }
 
@@ -352,7 +363,7 @@ export class HomeComponent implements OnInit {
 
   // Calculate distances between user and clubs
   calculateDistances(userLocation: { lat: number; lng: number }) {
-    this.clubs.forEach((club) => {
+    this.allClubs.forEach((club) => {
       const distance = this.getDistance(
         userLocation.lat,
         userLocation.lng,
