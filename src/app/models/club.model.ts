@@ -1,5 +1,6 @@
 export type WeekDay = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
 export type DayPeriod = 'Morning' | 'Afternoon' | 'Evening';
+export const DEFAULT_RADIUS_KM = 5;
 
 export interface TrainingSlot {
   day: WeekDay;

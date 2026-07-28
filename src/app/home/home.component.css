@@ -76,6 +76,7 @@
 .map-container {
   flex-grow: 1;
   height: 100%;
+  position: relative;
 }
 
 /* Club list items in sidebar */

@@ -1,8 +1,5 @@
-<app-header
-  (toggleView)="toggleViewMode()"
-  (locationSearch)="onLocationSearch($event)"
-  (filtersChange)="onFiltersChange($event)"
-></app-header>
+<app-header (toggleView)="toggleViewMode()" (locationSearch)="onLocationSearch($event)"
+  (filtersChange)="onFiltersChange($event)"></app-header>
 
 <div class="clubs-page-container">
   <!-- Location permission popup -->
@@ -14,16 +11,12 @@
         view them on a map?
       </p>
       <div class="flex space-x-4">
-        <button
-          (click)="handleLocationChoice(true)"
-          class="bg-[#f84c00] text-white px-4 py-2 rounded hover:bg-[#d94400] transition-colors"
-        >
+        <button (click)="handleLocationChoice(true)"
+          class="bg-[#f84c00] text-white px-4 py-2 rounded hover:bg-[#d94400] transition-colors">
           Yes, share my location
         </button>
-        <button
-          (click)="handleLocationChoice(false)"
-          class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
-        >
+        <button (click)="handleLocationChoice(false)"
+          class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition-colors">
           No, thanks
         </button>
       </div>
@@ -43,10 +36,8 @@
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Clubs Near You</h2>
         <div class="sort-dropdown">
-          <select
-            (change)="sortClubs($event)"
-            class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-[#f84c00] focus:border-[#f84c00]"
-          >
+          <select (change)="sortClubs($event)"
+            class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-[#f84c00] focus:border-[#f84c00]">
             <option *ngIf="locationShared" value="distance">
               Sort by Distance
             </option>
@@ -58,28 +49,16 @@
 
       <!-- Club list -->
       <div class="clubs-list">
-        <div
-          *ngFor="let club of clubs"
-          [id]="'club-' + club.id"
-          class="club-item"
-          [class.selected]="isClubSelected(club.id)"
-          (click)="selectClub(club)"
-          [style.background-image]="
+        <div *ngFor="let club of clubs" [id]="'club-' + club.id" class="club-item"
+          [class.selected]="isClubSelected(club.id)" (click)="selectClub(club)" [style.background-image]="
             'url(../../assets/activities/' + getMainActivity(club) + '.png)'
-          "
-          [style.background-size]="'cover'"
-          [style.background-position]="'center'"
-        >
+          " [style.background-size]="'cover'" [style.background-position]="'center'">
           <div class="club-info">
             <h3 class="club-name">{{ club.name }}</h3>
             <div class="club-rating">
               <span class="stars">
-                <i
-                  *ngFor="let star of [1, 2, 3, 4, 5]"
-                  class="fas fa-star"
-                  [class.text-yellow-400]="star <= club.rating"
-                  [class.text-gray-300]="star > club.rating"
-                ></i>
+                <i *ngFor="let star of [1, 2, 3, 4, 5]" class="fas fa-star"
+                  [class.text-yellow-400]="star <= club.rating" [class.text-gray-300]="star > club.rating"></i>
               </span>
               <span class="rating-value">{{ club.rating }}</span>
             </div>
@@ -93,14 +72,11 @@
             <div class="club-sports">
               <span *ngFor="let sport of club.sportTypes" class="sport-tag">{{
                 sport
-              }}</span>
+                }}</span>
             </div>
             <div class="club-hours">
               <i class="far fa-clock mr-1"></i>
-              <span
-                *ngFor="let schedule of club.openingHours"
-                class="schedule-item"
-              >
+              <span *ngFor="let schedule of club.openingHours" class="schedule-item">
                 {{ schedule.days }}: {{ schedule.hours }}
               </span>
             </div>
@@ -117,12 +93,13 @@
 
     <!-- Google Map -->
     <div class="map-container">
-      <google-map
-        height="100%"
-        width="100%"
-        [options]="mapOptions"
-        (mapInitialized)="onMapInitialized($event)"
-      >
+      <button *ngIf="showSearchAreaButton" (click)="searchThisArea()"
+        class="absolute top-4 left-1/2 -translate-x-1/2 z-10 bg-white shadow-lg rounded-full px-4 py-2 text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
+        <i class="fas fa-redo text-[#f84c00]"></i>
+        <span>Rechercher dans cette zone</span>
+      </button>
+
+      <google-map height="100%" width="100%" [options]="mapOptions" (mapInitialized)="onMapInitialized($event)">
       </google-map>
     </div>
   </div>
@@ -132,10 +109,8 @@
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Sports Clubs</h2>
       <div class="sort-dropdown">
-        <select
-          (change)="sortClubs($event)"
-          class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-[#f84c00] focus:border-[#f84c00]"
-        >
+        <select (change)="sortClubs($event)"
+          class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-[#f84c00] focus:border-[#f84c00]">
           <option value="rating">Sort by Rating</option>
           <option value="activity">Sort by Activity</option>
         </select>
@@ -144,26 +119,16 @@
 
     <!-- Club cards grid -->
     <div *ngIf="clubs.length > 0" class="clubs-grid">
-      <div
-        *ngFor="let club of clubs"
-        class="club-card cursor-pointer"
-        (click)="openClubDetails(club)"
+      <div *ngFor="let club of clubs" class="club-card cursor-pointer" (click)="openClubDetails(club)"
         [style.background-image]="
           'url(../../assets/activities/' + getMainActivity(club) + '.png)'
-        "
-        [style.background-size]="'cover'"
-        [style.background-position]="'center'"
-      >
+        " [style.background-size]="'cover'" [style.background-position]="'center'">
         <div class="card-content">
           <h3 class="card-title">{{ club.name }}</h3>
           <div class="club-rating">
             <span class="stars">
-              <i
-                *ngFor="let star of [1, 2, 3, 4, 5]"
-                class="fas fa-star"
-                [class.text-yellow-400]="star <= club.rating"
-                [class.text-gray-300]="star > club.rating"
-              ></i>
+              <i *ngFor="let star of [1, 2, 3, 4, 5]" class="fas fa-star" [class.text-yellow-400]="star <= club.rating"
+                [class.text-gray-300]="star > club.rating"></i>
             </span>
             <span class="rating-value">{{ club.rating }}</span>
           </div>
@@ -171,14 +136,11 @@
           <div class="card-sports">
             <span *ngFor="let sport of club.sportTypes" class="sport-tag">{{
               sport
-            }}</span>
+              }}</span>
           </div>
           <div class="card-hours">
             <i class="far fa-clock mr-1"></i>
-            <div
-              *ngFor="let schedule of club.openingHours"
-              class="schedule-item"
-            >
+            <div *ngFor="let schedule of club.openingHours" class="schedule-item">
               {{ schedule.days }}: {{ schedule.hours }}
             </div>
           </div>

@@ -8,7 +8,7 @@ import {
 import { HeaderComponent } from './header/header.component';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { Club, LocationSearch, SearchCriteria } from '../models/club.model';
+import { Club, DEFAULT_RADIUS_KM, LocationSearch, SearchCriteria } from '../models/club.model';
 import { ClubService } from '../services/club.service';
 
 @Component({
@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
   viewMode: 'map' | 'grid' = 'map';
   isLoadingLocation: boolean = false;
   showLocationPrompt: boolean = true;
+  private lastSearch: LocationSearch | null = null;
 
   // Clubs data
   allClubs: Club[] = [];
@@ -49,6 +50,8 @@ export class HomeComponent implements OnInit {
     zoom: 12,
     mapId: environment.googleMaps.mapId,
   };
+  showSearchAreaButton = false;
+  private programmaticMove = false;
 
   constructor(
     private ngZone: NgZone,
@@ -74,10 +77,26 @@ export class HomeComponent implements OnInit {
   }
 
   onLocationSearch(search: LocationSearch | null) {
+    this.lastSearch = search;
     this.baseClubs = search
       ? this.clubService.searchNearby(search)
       : this.allClubs;
     this.applyFilters();
+
+    if (search) {
+      this.centerMapOn(search);
+    }
+  }
+
+  private centerMapOn(search: LocationSearch) {
+    if (!this.map) return;
+
+    const bounds = new google.maps.Circle({
+      center: search.position,
+      radius: search.radiusKm * 1000,
+    }).getBounds();
+
+    if (bounds) this.map.fitBounds(bounds);
   }
 
   onFiltersChange(filters: SearchCriteria) {
@@ -111,7 +130,51 @@ export class HomeComponent implements OnInit {
       this.ngZone.run(() => this.deselectClub());
     });
 
+    map.addListener('dragend', () => {
+      this.ngZone.run(() => (this.showSearchAreaButton = true));
+    });
+
+    map.addListener('zoom_changed', () => {
+      this.ngZone.run(() => {
+        if (!this.programmaticMove) this.showSearchAreaButton = true;
+      });
+    });
+
+    map.addListener('idle', () => {
+      this.ngZone.run(() => {
+        if (this.programmaticMove) {
+          this.programmaticMove = false;
+          this.showSearchAreaButton = false;
+        }
+      });
+    });
+
     this.createAdvancedMarkers();
+  }
+
+  searchThisArea() {
+    if (!this.map) return;
+
+    const center = this.map.getCenter();
+    const bounds = this.map.getBounds();
+    if (!center || !bounds) return;
+
+    const northEast = bounds.getNorthEast();
+
+    this.lastSearch = {
+      address: 'Cette zone',
+      position: { lat: center.lat(), lng: center.lng() },
+      radiusKm: this.getDistance(
+        center.lat(),
+        center.lng(),
+        northEast.lat(),
+        northEast.lng(),
+      ),
+    };
+
+    this.baseClubs = this.clubService.searchNearby(this.lastSearch);
+    this.applyFilters();
+    this.showSearchAreaButton = false;
   }
 
   openClubDetails(club: Club) {
@@ -299,17 +362,9 @@ export class HomeComponent implements OnInit {
         // Update the marker content
         marker.content = pinElement;
       } else {
-        // Reset non-selected markers to default appearance
         marker.zIndex = undefined;
 
-        // Create a default pin - FIX: Using the 'element' property
-        const defaultPin = new google.maps.marker.PinElement({
-          glyph: clubId.toString().charAt(0),
-          background: '#4285F4',
-          borderColor: '#4285F4',
-        });
-
-        // Update the marker content with the correct property
+        const defaultPin = new google.maps.marker.PinElement();
         marker.content = defaultPin.element;
       }
     });
@@ -340,26 +395,18 @@ export class HomeComponent implements OnInit {
             lng: position.coords.longitude,
           };
 
-          // Update map center to user location
-          if (this.map) {
-            this.map.setCenter(userLocation);
-            this.map.setZoom(14);
-          } else {
-            this.mapOptions = {
-              ...this.mapOptions,
-              center: userLocation,
-              zoom: 14,
-            };
+          if (!this.map) {
+            this.mapOptions = { ...this.mapOptions, center: userLocation };
           }
 
-          // Calculate distances to clubs
           this.calculateDistances(userLocation);
           this.isLoadingLocation = false;
 
-          // Create markers if the map is ready
-          if (this.map) {
-            this.createAdvancedMarkers();
-          }
+          this.onLocationSearch({
+            address: 'Autour de moi',
+            position: userLocation,
+            radiusKm: DEFAULT_RADIUS_KM,
+          });
         },
         (error) => {
           console.warn('Geolocation unavailable:', error.message);

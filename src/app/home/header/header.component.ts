@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import {
   Club,
   DayPeriod,
+  DEFAULT_RADIUS_KM,
   LocationSearch,
   SearchCriteria,
   WeekDay,
@@ -50,10 +51,12 @@ export class HeaderComponent implements OnInit {
   // Map and location related properties
   private autocompletes = new Map<boolean, Promise<any>>();
   private mapHost: HTMLElement | null = null;
+  private mapDivEl: HTMLElement | null = null;
   private mobileMapHost: HTMLElement | null = null;
 
-  @ViewChild('mapDiv') set mapDivRef(host: ElementRef<HTMLElement> | undefined) {
-    if (host && this.selectedLocation) {
+@ViewChild('mapDiv') set mapDivRef(host: ElementRef<HTMLElement> | undefined) {
+    this.mapDivEl = host?.nativeElement ?? null;
+    if (this.mapDivEl && this.selectedLocation) {
       this.initializeMap(this.selectedLocation, false);
     }
   }
@@ -73,7 +76,7 @@ export class HeaderComponent implements OnInit {
   mobileMap: any = null;
   radiusCircle: any = null;
   mobileRadiusCircle: any = null;
-  searchRadius: number = 5; // Default radius
+  searchRadius: number = DEFAULT_RADIUS_KM;
   locationEntered: boolean = false;
   selectedLocation: any = null;
 
@@ -151,61 +154,37 @@ export class HeaderComponent implements OnInit {
     setTimeout(() => this.initializeMap(place, isMobile), 100);
   }
 
-  // Initialize or update the map with the selected location and radius
   initializeMap(place: any, isMobile: boolean) {
     const location = place.location;
 
     const mapElement = isMobile
       ? this.mobileMapDiv?.nativeElement
-      : this.mapDivRef?.nativeElement;
+      : this.mapDivEl;
     if (!mapElement) return;
 
+    const mapOptions = {
+      center: location,
+      zoom: 12,
+      disableDefaultUI: true,
+      zoomControl: true,
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }],
+        },
+      ],
+    };
+
     if (isMobile) {
-      if (!this.mobileMap) {
-        if (!this.mobileMap || this.mobileMapHost !== mapElement) {
-          this.mobileMap = new google.maps.Map(mapElement, {
-            center: location,
-            zoom: 12,
-            disableDefaultUI: true,
-            zoomControl: true,
-            styles: [
-              {
-                featureType: 'poi',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }],
-              },
-            ],
-          });
-          this.mobileMapHost = mapElement;
-        } else {
-          this.map.setCenter(location);
-        }
+      if (!this.mobileMap || this.mobileMapHost !== mapElement) {
+        this.mobileMap = new google.maps.Map(mapElement, mapOptions);
+        this.mobileMapHost = mapElement;
       } else {
-        if (!this.map || this.mapHost !== mapElement) {
-          this.map = new google.maps.Map(mapElement, {
-            center: location,
-            zoom: 12,
-            disableDefaultUI: true,
-            zoomControl: true,
-            styles: [
-              {
-                featureType: 'poi',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }],
-              },
-            ],
-          });
-          this.mapHost = mapElement;
-        } else {
-          this.map.setCenter(location);
-        }
+        this.mobileMap.setCenter(location);
       }
 
-      // Update or create the radius circle
-      if (this.mobileRadiusCircle) {
-        this.mobileRadiusCircle.setMap(null);
-      }
-
+      this.mobileRadiusCircle?.setMap(null);
       this.mobileRadiusCircle = new google.maps.Circle({
         strokeColor: '#f84c00',
         strokeOpacity: 0.8,
@@ -214,35 +193,19 @@ export class HeaderComponent implements OnInit {
         fillOpacity: 0.2,
         map: this.mobileMap,
         center: location,
-        radius: this.searchRadius * 1000, // Convert km to meters
+        radius: this.searchRadius * 1000,
       });
 
-      // Adjust zoom to fit the circle
       this.fitCircleToMap(this.mobileMap, this.mobileRadiusCircle);
     } else {
-      if (!this.map) {
-        this.map = new google.maps.Map(mapElement, {
-          center: location,
-          zoom: 12,
-          disableDefaultUI: true,
-          zoomControl: true,
-          styles: [
-            {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            },
-          ],
-        });
+      if (!this.map || this.mapHost !== mapElement) {
+        this.map = new google.maps.Map(mapElement, mapOptions);
+        this.mapHost = mapElement;
       } else {
         this.map.setCenter(location);
       }
 
-      // Update or create the radius circle
-      if (this.radiusCircle) {
-        this.radiusCircle.setMap(null);
-      }
-
+      this.radiusCircle?.setMap(null);
       this.radiusCircle = new google.maps.Circle({
         strokeColor: '#f84c00',
         strokeOpacity: 0.8,
@@ -251,10 +214,9 @@ export class HeaderComponent implements OnInit {
         fillOpacity: 0.2,
         map: this.map,
         center: location,
-        radius: this.searchRadius * 1000, // Convert km to meters
+        radius: this.searchRadius * 1000,
       });
 
-      // Adjust zoom to fit the circle
       this.fitCircleToMap(this.map, this.radiusCircle);
     }
   }
