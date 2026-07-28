@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import {
   Club,
   DayPeriod,
+  LocationSearch,
   SearchCriteria,
   WeekDay,
 } from '../../models/club.model';
@@ -30,6 +31,8 @@ declare var google: any;
 })
 export class HeaderComponent implements OnInit {
   @Output() toggleView = new EventEmitter<void>();
+  @Output() filtersChange = new EventEmitter<SearchCriteria>();
+  @Output() locationSearch = new EventEmitter<LocationSearch | null>();
 
   // Dropdown states
   activeDropdown: 'location' | 'activity' | 'time' | null = null;
@@ -46,8 +49,14 @@ export class HeaderComponent implements OnInit {
 
   // Map and location related properties
   private autocompletes = new Map<boolean, Promise<any>>();
+  private mapHost: HTMLElement | null = null;
+  private mobileMapHost: HTMLElement | null = null;
 
-  @ViewChild('mapDiv') mapDiv!: ElementRef;
+  @ViewChild('mapDiv') set mapDivRef(host: ElementRef<HTMLElement> | undefined) {
+    if (host && this.selectedLocation) {
+      this.initializeMap(this.selectedLocation, false);
+    }
+  }
   @ViewChild('mobileMapDiv') mobileMapDiv!: ElementRef;
   @ViewChild('locationHost') set locationHost(
     host: ElementRef<HTMLElement> | undefined,
@@ -77,7 +86,7 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private ngZone: NgZone,
     private clubService: ClubService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.sportTypes = this.clubService.getSportTypes();
@@ -119,6 +128,7 @@ export class HeaderComponent implements OnInit {
     const { PlaceAutocompleteElement } =
       await google.maps.importLibrary('places');
     const element = new PlaceAutocompleteElement();
+    element.setAttribute('no-clear-button', '');
     element.style.width = '100%';
 
     element.addEventListener('gmp-select', async (event: any) => {
@@ -147,26 +157,48 @@ export class HeaderComponent implements OnInit {
 
     const mapElement = isMobile
       ? this.mobileMapDiv?.nativeElement
-      : this.mapDiv?.nativeElement;
+      : this.mapDivRef?.nativeElement;
     if (!mapElement) return;
 
     if (isMobile) {
       if (!this.mobileMap) {
-        this.mobileMap = new google.maps.Map(mapElement, {
-          center: location,
-          zoom: 12,
-          disableDefaultUI: true,
-          zoomControl: true,
-          styles: [
-            {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            },
-          ],
-        });
+        if (!this.mobileMap || this.mobileMapHost !== mapElement) {
+          this.mobileMap = new google.maps.Map(mapElement, {
+            center: location,
+            zoom: 12,
+            disableDefaultUI: true,
+            zoomControl: true,
+            styles: [
+              {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }],
+              },
+            ],
+          });
+          this.mobileMapHost = mapElement;
+        } else {
+          this.map.setCenter(location);
+        }
       } else {
-        this.mobileMap.setCenter(location);
+        if (!this.map || this.mapHost !== mapElement) {
+          this.map = new google.maps.Map(mapElement, {
+            center: location,
+            zoom: 12,
+            disableDefaultUI: true,
+            zoomControl: true,
+            styles: [
+              {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }],
+              },
+            ],
+          });
+          this.mapHost = mapElement;
+        } else {
+          this.map.setCenter(location);
+        }
       }
 
       // Update or create the radius circle
@@ -258,14 +290,6 @@ export class HeaderComponent implements OnInit {
     if (this.activeDropdown) {
       this.userDropdownOpen = false;
     }
-
-    if (
-      this.activeDropdown === 'location' &&
-      this.locationEntered &&
-      this.selectedLocation
-    ) {
-      setTimeout(() => this.initializeMap(this.selectedLocation, false), 100);
-    }
   }
 
   // Toggle user dropdown menu
@@ -305,16 +329,54 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  private emitFilters(): void {
+    this.filtersChange.emit({
+      sports: [...this.selectedSports],
+      days: [...this.selectedDays],
+      times: [...this.selectedTimes],
+    });
+  }
+
   toggleSport(sport: string): void {
     this.toggle(this.selectedSports, sport);
+    this.emitFilters();
   }
 
   toggleDay(day: WeekDay): void {
     this.toggle(this.selectedDays, day);
+    this.emitFilters();
   }
 
   toggleTimeOfDay(period: DayPeriod): void {
     this.toggle(this.selectedTimes, period);
+    this.emitFilters();
+  }
+
+  clearSports(): void {
+    this.selectedSports = [];
+    this.emitFilters();
+  }
+
+  clearWhen(): void {
+    this.selectedDays = [];
+    this.selectedTimes = [];
+    this.emitFilters();
+  }
+
+  searchLocation(isMobile: boolean = false): void {
+    if (!this.selectedLocation?.location) return;
+
+    this.locationSearch.emit({
+      address: this.selectedLocation.formattedAddress,
+      position: {
+        lat: this.selectedLocation.location.lat(),
+        lng: this.selectedLocation.location.lng(),
+      },
+      radiusKm: this.searchRadius,
+    });
+
+    this.activeDropdown = null;
+    if (isMobile) this.mobileSearchOpen = false;
   }
 
   // Scroll to top when clicking the logo
@@ -326,14 +388,15 @@ export class HeaderComponent implements OnInit {
   }
 
   get sportsLabel(): string {
-    if (this.selectedSports.length === 0) return 'Sport type';
+    if (this.selectedSports.length === 0) return 'Any sport';
     if (this.selectedSports.length === 1) return this.selectedSports[0];
     return `${this.selectedSports.length} sports`;
   }
 
   get whenLabel(): string {
-    const parts = [...this.selectedDays, ...this.selectedTimes];
-    return parts.length ? parts.join(', ') : 'Training time';
+    return this.selectedDays.length || this.selectedTimes.length
+      ? 'Custom schedule'
+      : 'Any time';
   }
 
   // Close all dropdowns when scrolling
@@ -361,14 +424,13 @@ export class HeaderComponent implements OnInit {
     const pending = this.autocompletes.get(isMobile);
     if (pending) {
       const element = await pending;
-      const host = element.parentElement;
-      element.remove();
-      this.autocompletes.delete(isMobile);
-      if (host) this.mountAutocomplete(host, isMobile);
+      element.value = '';
     }
 
     const circle = isMobile ? this.mobileRadiusCircle : this.radiusCircle;
     circle?.setMap(null);
+
+    this.locationSearch.emit(null);
   }
 
   onToggleView() {

@@ -66,3 +66,9 @@ export interface Club {
   contact: ClubContact;
   videoUrl?: string;
 }
+
+export interface LocationSearch {
+  address: string;
+  position: { lat: number; lng: number };
+  radiusKm: number;
+}

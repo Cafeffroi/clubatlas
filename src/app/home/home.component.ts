@@ -8,7 +8,7 @@ import {
 import { HeaderComponent } from './header/header.component';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
-import { Club, SearchCriteria } from '../models/club.model';
+import { Club, LocationSearch, SearchCriteria } from '../models/club.model';
 import { ClubService } from '../services/club.service';
 
 @Component({
@@ -32,6 +32,8 @@ export class HomeComponent implements OnInit {
   clubs: Club[] = [];
   selectedClubId: number | null = null;
   selectedClub: Club | null = null;
+  baseClubs: Club[] = [];
+  filters: SearchCriteria = { sports: [], days: [], times: [] };
 
   // Track active info window
   activeInfoWindow: google.maps.InfoWindow | null = null;
@@ -52,11 +54,12 @@ export class HomeComponent implements OnInit {
     private ngZone: NgZone,
     private router: Router,
     private clubService: ClubService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.allClubs = this.clubService.getClubs();
-    this.clubs = this.allClubs;
+    this.baseClubs = this.allClubs;
+    this.applyFilters();
 
     // Check if user has already made a location choice
     const locationChoice = localStorage.getItem('locationConsent');
@@ -70,8 +73,20 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  onSearch(criteria: SearchCriteria) {
-    this.clubs = this.clubService.search(criteria);
+  onLocationSearch(search: LocationSearch | null) {
+    this.baseClubs = search
+      ? this.clubService.searchNearby(search)
+      : this.allClubs;
+    this.applyFilters();
+  }
+
+  onFiltersChange(filters: SearchCriteria) {
+    this.filters = filters;
+    this.applyFilters();
+  }
+
+  private applyFilters() {
+    this.clubs = this.clubService.filter(this.baseClubs, this.filters);
     this.deselectClub();
 
     if (this.map) {
@@ -231,26 +246,24 @@ export class HomeComponent implements OnInit {
                     background-image: url('assets/activities/${mainActivity}.png');
                     background-size: cover; background-position: center; opacity: 0.7; z-index: -1;"></div>
         <div style="position: relative; z-index: 1; background: linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); padding: 10px; border-radius: 6px;">
-        <h3 style="margin: 0 0 8px 0; color: #f84c00; font-weight: bold;">${
-          club.name
-        }</h3>
+        <h3 style="margin: 0 0 8px 0; color: #f84c00; font-weight: bold;">${club.name
+      }</h3>
         <div style="margin-bottom: 5px;">
           ${this.createStarRating(club.rating)}
           <span style="margin-left: 5px;">${club.rating}</span>
         </div>
         <p style="margin: 5px 0; font-size: 14px;">${club.address}</p>
-        ${
-          club.distance
-            ? `<p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-location-arrow" style="margin-right: 5px;"></i>${club.distance} away</p>`
-            : ''
-        }
+        ${club.distance
+        ? `<p style="margin: 5px 0; font-size: 13px; color: #666;"><i class="fas fa-location-arrow" style="margin-right: 5px;"></i>${club.distance} away</p>`
+        : ''
+      }
         <div style="margin: 8px 0;">
           ${club.sportTypes
-            .map(
-              (sport) =>
-                `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`,
-            )
-            .join('')}
+        .map(
+          (sport) =>
+            `<span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${sport}</span>`,
+        )
+        .join('')}
         </div>
         <a href="#" data-view-details style="display: inline-block; background: #f84c00; color: white; padding: 5px 12px; border-radius: 4px; text-decoration: none; margin-top: 5px; font-size: 14px;">View Details</a>
       </div>
@@ -388,9 +401,9 @@ export class HomeComponent implements OnInit {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.deg2rad(lat1)) *
-        Math.cos(this.deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos(this.deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; // Distance in km
     return distance;
