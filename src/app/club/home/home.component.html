@@ -1,10 +1,10 @@
 <main class="pt-[68px]">
   <!-- Push Section -->
+  <!-- Presentation Section -->
   <section
-    id="push"
-    class="min-h-screen relative flex flex-col items-center justify-center p-8 overflow-hidden"
+    id="presentation"
+    class="relative min-h-screen flex flex-col items-center gap-12 px-8 py-24 overflow-hidden"
   >
-    <!-- Background Video -->
     <video
       *ngIf="showVideo; else heroFallback"
       autoplay
@@ -28,32 +28,26 @@
       ></div>
     </ng-template>
 
-    <!-- Dark overlay with gradient -->
     <div
       class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/60 via-black/80 to-black -z-10"
     ></div>
 
-    <!-- Content -->
-    <div class="text-center text-white z-10 space-y-8">
+    <div class="text-center text-white max-w-3xl mb-12">
       <h2 class="text-4xl md:text-5xl font-bold mb-4">{{ club.heroTitle }}</h2>
-      <p class="text-xl md:text-2xl mb-8">{{ club.heroSubtitle }}</p>
+      <p class="text-xl md:text-2xl">{{ club.heroSubtitle }}</p>
     </div>
-  </section>
 
-  <!-- Presentation Section -->
-  <section
-    id="presentation"
-    class="min-h-screen p-8 bg-black flex flex-col items-center gap-12"
-  >
-    <div class="w-2/3 flex justify-start">
-      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-[80%]">
+    <div class="w-full max-w-5xl flex justify-start">
+      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-full md:w-[70%]">
         <h3 class="text-2xl font-semibold mb-3">Le club</h3>
         <p>{{ club.presentation }}</p>
       </div>
     </div>
 
-    <div class="w-2/3 flex justify-end">
-      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-[80%] text-right">
+    <div class="w-full max-w-5xl flex justify-end">
+      <div
+        class="bg-gray-200 p-6 rounded-lg shadow-lg w-full md:w-[70%] text-right"
+      >
         <h3 class="text-2xl font-semibold mb-3">Horaires</h3>
         <p *ngFor="let slot of club.openingHours">
           {{ slot.days }} : {{ slot.hours }}
@@ -61,36 +55,31 @@
       </div>
     </div>
 
-    <div class="w-2/3 flex justify-start">
-      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-[80%]">
+    <div class="w-full max-w-5xl flex justify-start">
+      <div class="bg-gray-200 p-6 rounded-lg shadow-lg w-full md:w-[70%]">
         <h3 class="text-2xl font-semibold mb-3">Pourquoi nous rejoindre ?</h3>
         <p>{{ club.whyJoin }}</p>
       </div>
     </div>
   </section>
 
-  <!-- Price Section -->
-  <section id="price" class="min-h-screen p-8 bg-gray-200">
+  <section id="price" class="py-16 md:py-24 px-8 bg-gray-200">
     <app-pricing [plans]="club.pricing"></app-pricing>
   </section>
 
-  <!-- Events Section -->
-  <section id="event" class="min-h-screen p-8 bg-gray-900 text-white">
+  <section id="event" class="py-16 md:py-24 px-8 bg-gray-900 text-white">
     <app-event [events]="club.events"></app-event>
   </section>
 
-  <!-- FAQ Section -->
-  <section id="faq" class="min-h-screen p-8 bg-gray-200">
+  <section id="faq" class="py-16 md:py-24 px-8 bg-gray-200">
     <app-faq [items]="club.faq"></app-faq>
   </section>
 
-  <!-- Insta fee Section -->
-  <section id="instafeed" class="min-h-screen p-8 bg-gray-900">
+  <section id="instafeed" class="py-16 md:py-24 px-8 bg-gray-900">
     <app-instagram-feed [handle]="club.contact.instagram"></app-instagram-feed>
   </section>
 
-  <!-- Contact Section -->
-  <section id="contact" class="min-h-screen p-8 bg-gray-200">
+  <section id="contact" class="py-16 md:py-24 px-8 bg-gray-200">
     <app-contact [club]="club"></app-contact>
   </section>
 </main>
